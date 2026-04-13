@@ -1,67 +1,105 @@
 ﻿# AgenticAI Repo (Public Code)
 
-This is the runnable code companion for the AgenticAI book.
+Code companion for the AgenticAI book — designed for students to learn by running real examples.
 
-## What this repo contains
-- Core learning modules in `module01_raw/` to `module05_enterprise/`
-- Capstone implementations in `capstones/`
-- Playground app in `playground/`
-- Evaluation suites in `evaluations/`
-- Setup assets: `requirements.txt`, `setup_steps.md`, `.env.example`
+---
 
-## Prerequisites
-- Python 3.9+
-- Ollama installed and running: https://ollama.ai
-- Git + terminal (`PowerShell`, `bash`, or `zsh`)
+## 🚀 Start here (5 minutes)
 
-## Setup
+1. Install Python 3.9+ and Ollama: https://ollama.ai
+
+2. Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Windows PowerShell:
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Linux / macOS:
+```bash
+source .venv/bin/activate
+```
+
+3. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
+```
+
+4. Pull required local models:
+
+```bash
 ollama pull llama3
 ollama pull nomic-embed-text
+```
+
+5. Start Ollama:
+
+```bash
 ollama serve
 ```
 
-For full workshop setup notes, see `setup_steps.md`.
+6. Run a first example:
 
-## Configuration
+```bash
+python capstones/capstone1_sql_agent/cap1_app.py "List engineering employees with salary > 2000000"
+```
+
+---
+
+## 🧭 Repo map
+
+- `module01_raw/` → `module05_enterprise/` — progressive learning modules
+- `capstones/` — end-to-end projects
+- `playground/` — Streamlit app for interactive experimentation
+- `evaluations/` — test suites and sanity checks
+- `scripts/` — reusable smoke test command-line tools
+
+---
+
+## ⚙️ Configuration
+
 Environment variables (optional):
 - `OLLAMA_BASE` (default: `http://localhost:11434`)
 - `OLLAMA_MODEL` (default: `llama3`)
 - `OLLAMA_EMBED_MODEL` (default: `nomic-embed-text`)
 
-PowerShell example:
+PowerShell:
 ```powershell
 $env:OLLAMA_MODEL = "llama3"
 $env:OLLAMA_EMBED_MODEL = "nomic-embed-text"
 ```
 
-Bash/zsh example:
+Bash/zsh:
 ```bash
 export OLLAMA_MODEL=llama3
 export OLLAMA_EMBED_MODEL=nomic-embed-text
 ```
 
+---
+
 ## 🎯 Capstone projects
 
 ### 1) SQLite Analyst Agent (`capstone1_sql_agent`)
-Natural language to safe SQL (`SELECT`-only), execution, explain plan, and summary.
+Natural language → safe SQL (`SELECT`-only) → execution → explain plan → summary.
 
-Run:
 ```bash
 python capstones/capstone1_sql_agent/cap1_app.py "List engineering employees with salary > 2000000"
 ```
 
 ### 2) Research Agent (`capstone2_research_agent`)
-Planner/executor pattern with research-focused tools and PDF ingestion.
+Planner/executor workflow with research-focused tools and PDF ingestion.
 
-Run:
 ```bash
 python capstones/capstone2_research_agent/run.py "Survey methods for low-resource NER"
 ```
 
 ### 3) Standalone RAG Agent (`capstone3_rag_agent`)
-PDF ingestion + persistent vector index + conversational querying.
+Build a persistent index and run conversational retrieval.
 
 Build index:
 ```bash
@@ -73,70 +111,79 @@ Query agent:
 python capstones/capstone3_rag_agent/query_agent.py --persist_dir capstones/capstone3_rag_agent/chroma_db
 ```
 
+---
+
 ## 🎮 Playground
-Run the Streamlit app:
+
 ```bash
 streamlit run playground/app.py
 ```
 
-## 🧪 Evaluations & tests
-Run all tests:
+---
+
+## 🧪 Testing and sanity checks
+
+### Standard tests
+Run all:
 ```bash
 pytest -q
 ```
 
-Run selected suites:
+Run selected:
 ```bash
 pytest evaluations/tests_unit -q
 pytest evaluations/tests_rag -q
 pytest evaluations/tests_agents -q
 ```
 
-### Reusable smoke test command
-Quick smoke (files + imports + versions):
+### Reusable smoke command (recommended)
+Quick smoke (versions + files + imports + compile check):
 ```bash
 python scripts/smoke_test.py
 ```
 
-Include pytest collection checks:
+Add pytest collection checks:
 ```bash
 python scripts/smoke_test.py --with-pytest
 ```
 
-Include Ollama endpoint check:
+Add Ollama endpoint check:
 ```bash
 python scripts/smoke_test.py --with-ollama
 ```
 
-Run curated sample-command sanity suite:
+Run deterministic sample-suite sanity:
 ```bash
 python scripts/smoke_test.py --with-samples
 ```
 
-Run live sample execution checks (uses LLM/tooling and may take longer):
+Run live sample execution checks (LLM/tooling, longer):
 ```bash
 python scripts/smoke_test.py --with-live-samples --samples-timeout 180
 ```
 
-List configured sample commands:
+List configured sample checks:
 ```bash
 python scripts/smoke_test.py --list-samples
 ```
 
 PowerShell wrapper:
 ```powershell
-.\scripts\smoke_test.ps1 -WithPytest -WithOllama
+.\scripts\smoke_test.ps1 -WithPytest -WithOllama -WithSamples
 ```
 
-## Troubleshooting
-- **Connection refused**: start Ollama with `ollama serve`
+---
+
+## 🛠️ Troubleshooting
+
+- **Connection refused**: start Ollama using `ollama serve`
 - **Model not found**: run `ollama pull llama3` and `ollama list`
-- **Import issues**: `pip install --upgrade -r requirements.txt`
-- **Advanced demo model tags**: some module scripts use `llama3.1:latest`, `lfm2.5-thinking:latest`, or `llava`; pull them if you run those specific demos.
+- **Import issues**: run `pip install --upgrade -r requirements.txt`
+- **Advanced model tags**: some demos use `llama3.1:latest`, `lfm2.5-thinking:latest`, or `llava`; pull them only when needed.
 
-## Notes
-- Book manuscript and diagram-authoring assets are intentionally excluded from this public repo.
+---
+
+## 📝 Notes
+
+- Book manuscript/diagram authoring assets are intentionally excluded from this public repo.
 - Book content is maintained in the private `agenticai_book` repository.
-
-
-
