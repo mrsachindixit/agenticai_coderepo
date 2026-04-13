@@ -46,4 +46,5 @@ Some module demos use additional model tags. Pull these only if needed:
 ```bash
 ollama pull llama3.1:latest
 ollama pull lfm2.5-thinking:latest
+ollama pull llava
 ```
