@@ -1,4 +1,4 @@
-"""Build a minimal RAG index from markdown documents using Ollama embeddings."""
+"""Build a minimal RAG index from text documents using Ollama embeddings."""
 
 import os
 import json
@@ -13,11 +13,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 # Output index file path
 OUT_FILE = "index.json"
 
-def load_docs(path=os.path.join(os.path.dirname(__file__), "data", "*.md")):
-    """Load markdown documents from a directory pattern.
+def load_docs(path=os.path.join(os.path.dirname(__file__), "data", "*.txt")):
+    """Load text documents from a directory pattern.
     
     Args:
-        path: Glob pattern for markdown files (default: data/*.md)
+        path: Glob pattern for text files (default: data/*.txt)
     
     Returns:
         List of dicts with 'id' (filename) and 'text' (content)
@@ -29,7 +29,7 @@ def load_docs(path=os.path.join(os.path.dirname(__file__), "data", "*.md")):
     return docs
 
 if __name__ == "__main__":
-    # Load all .md files from data/
+    # Load all .txt files from data/
     docs = load_docs()
     if not docs:
         print("No documents found in data/ directory.")

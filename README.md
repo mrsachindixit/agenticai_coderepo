@@ -2,8 +2,6 @@
 
 Build real AI agents from scratch: tool-calling, RAG, memory, multi-agent systems, and production hardening — all running locally with Ollama.
 
-> This repo accompanies the **AgenticAI** book. Every module maps directly to a chapter.
-
 ---
 
 ## 🚀 Start here (5 minutes)
@@ -68,10 +66,10 @@ Follow the modules in order — each one builds on the previous:
 | `module03_langchain/` | LangChain agents, memory, LangGraph, middleware |
 | `module04_production/` | Security, performance, monitoring, PII/bias |
 | `module05_enterprise/` | MCP, A2A protocols, enterprise patterns |
+| `module06_frameworks/` | LlamaIndex, DSPy, Embabel — framework comparison samples |
 | `capstones/` | End-to-end projects combining all concepts |
 | `playground/` | Interactive Streamlit app |
 | `evaluations/` | Test suites and sanity checks |
-| `scripts/` | Reusable smoke test runner |
 
 ---
 
@@ -99,31 +97,41 @@ export OLLAMA_EMBED_MODEL=nomic-embed-text
 
 ---
 
-## 🎯 Capstone projects
+## 🎯 Capstone assignments
 
-### 1 · SQLite Analyst Agent
-> Natural language → safe SQL → execution → explain plan → summary
+Treat each capstone as a practical assignment with a clear objective, deliverable, and run check.
 
+### Assignment 1 · SQLite Analyst Agent
+**Objective:** Convert natural-language business questions into safe, executable SQL.
+
+**Deliverable:** An agent answer that includes query intent, SQL execution result, and summary.
+
+**Run check:**
 ```bash
 python capstones/capstone1_sql_agent/cap1_app.py "List engineering employees with salary > 2000000"
 ```
 
-### 2 · Research Agent
-> Planner/executor workflow with research tools and PDF ingestion
+### Assignment 2 · Research Agent
+**Objective:** Orchestrate planner/executor steps to produce a concise research output.
 
+**Deliverable:** A structured response based on tool-driven evidence collection.
+
+**Run check:**
 ```bash
 python capstones/capstone2_research_agent/run.py "Survey methods for low-resource NER"
 ```
 
-### 3 · Standalone RAG Agent
-> Ingest documents, build a persistent vector index, and query conversationally
+### Assignment 3 · Standalone RAG Agent
+**Objective:** Build and query a local retrieval index over your documents.
 
-Build index first:
+**Deliverable:** Reproducible ingest/index workflow and grounded answers from indexed content.
+
+**Run check (step 1: build index):**
 ```bash
 python capstones/capstone3_rag_agent/build_index.py --data_dir capstones/capstone3_rag_agent/data --persist_dir capstones/capstone3_rag_agent/chroma_db
 ```
 
-Then query:
+**Run check (step 2: query):**
 ```bash
 python capstones/capstone3_rag_agent/query_agent.py --persist_dir capstones/capstone3_rag_agent/chroma_db
 ```
@@ -152,41 +160,11 @@ pytest -q
 Focused suites:
 ```bash
 pytest evaluations/tests_unit -q
-pytest evaluations/tests_rag -q
-pytest evaluations/tests_agents -q
+pytest evaluations/tests_modules -q
+pytest evaluations/tests_samples -q
 ```
 
-### Smoke test (run this before every session)
-
-Quick check — versions, files, imports, compile:
-```bash
-python scripts/smoke_test.py
-```
-
-With pytest collection + Ollama endpoint check:
-```bash
-python scripts/smoke_test.py --with-pytest --with-ollama
-```
-
-Full deterministic sample suite:
-```bash
-python scripts/smoke_test.py --with-samples
-```
-
-Live execution checks (uses LLM, takes longer):
-```bash
-python scripts/smoke_test.py --with-live-samples --samples-timeout 180
-```
-
-List all configured sample checks:
-```bash
-python scripts/smoke_test.py --list-samples
-```
-
-PowerShell wrapper:
-```powershell
-.\scripts\smoke_test.ps1 -WithPytest -WithOllama -WithSamples
-```
+`evaluations/tests_modules/` is the single-owner suite for module files (`module01_raw` → `module05_enterprise`) with one self-contained test per source file.
 
 ---
 
@@ -203,6 +181,5 @@ PowerShell wrapper:
 
 ## 📝 Notes
 
-- Book manuscript and diagram assets are in the private `agenticai_book` repository and are intentionally excluded here.
 - All code runs fully locally — no OpenAI API key or cloud account required.
 

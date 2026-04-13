@@ -11,7 +11,7 @@ import os
 
 def load_docs():
     docs = []
-    for fp in glob.glob(os.path.join(os.path.dirname(__file__), "..","module01_raw", "1.8_rag_basic" ,"data", "*.md")):
+    for fp in glob.glob(os.path.join(os.path.dirname(__file__), "..","module01_raw", "1.8_rag_basic" ,"data", "*.txt")):
         with open(fp, "r", encoding="utf-8") as f:
             docs.append(f.read())
     print(docs)

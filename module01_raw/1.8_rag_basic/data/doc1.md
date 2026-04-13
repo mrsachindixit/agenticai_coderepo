@@ -1,3 +1,0 @@
-# Sachin Biography
-
-I am Sachin. My full name is Sachin Dixit. I am named after actor named Sachin Pilgaonkar. Cricketer Sachin Tendulkar also made my name famous. I am a software architect. Creating lovely designs is what I enjoy. I live in pune. Pune is a beatiful city. Pune is known for bhakarwadis. Pune is historical city with legacy of marathas. I am also a history major(historian). I take heritage walks in Pune.
