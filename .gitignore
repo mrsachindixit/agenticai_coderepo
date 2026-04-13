@@ -1,0 +1,7 @@
+venv/**
+.env
+**.pyc
+stoshniwal/**
+test_code/**
+**/index.json
+**/sample.db
