@@ -1,14 +1,18 @@
-﻿# AgenticAI Repo (Public Code)
+﻿# 🤖 AgenticAI — Hands-On Code Companion
 
-Code companion for the AgenticAI book — designed for students to learn by running real examples.
+Build real AI agents from scratch: tool-calling, RAG, memory, multi-agent systems, and production hardening — all running locally with Ollama.
+
+> This repo accompanies the **AgenticAI** book. Every module maps directly to a chapter.
 
 ---
 
 ## 🚀 Start here (5 minutes)
 
-1. Install Python 3.9+ and Ollama: https://ollama.ai
+**Step 1 — Install prerequisites**
+- Python 3.9+: https://python.org
+- Ollama: https://ollama.ai
 
-2. Create and activate a virtual environment:
+**Step 2 — Create and activate a virtual environment**
 
 ```bash
 python -m venv .venv
@@ -24,57 +28,70 @@ Linux / macOS:
 source .venv/bin/activate
 ```
 
-3. Install dependencies:
+**Step 3 — Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Pull required local models:
+**Step 4 — Pull local models**
 
 ```bash
 ollama pull llama3
 ollama pull nomic-embed-text
 ```
 
-5. Start Ollama:
+**Step 5 — Start Ollama**
 
 ```bash
 ollama serve
 ```
 
-6. Run a first example:
+**Step 6 — Run your first example**
 
 ```bash
 python capstones/capstone1_sql_agent/cap1_app.py "List engineering employees with salary > 2000000"
 ```
 
+You should see a natural-language answer backed by a live SQL query. If that works, you're ready.
+
 ---
 
-## 🧭 Repo map
+## 🗺️ Learning path
 
-- `module01_raw/` → `module05_enterprise/` — progressive learning modules
-- `capstones/` — end-to-end projects
-- `playground/` — Streamlit app for interactive experimentation
-- `evaluations/` — test suites and sanity checks
-- `scripts/` — reusable smoke test command-line tools
+Follow the modules in order — each one builds on the previous:
+
+| Module | Topic |
+|---|---|
+| `module01_raw/` | LLM basics, tool calling, RAG intro, memory |
+| `module02_basics/` | Chat objects, multi-modal, image analysis |
+| `module03_langchain/` | LangChain agents, memory, LangGraph, middleware |
+| `module04_production/` | Security, performance, monitoring, PII/bias |
+| `module05_enterprise/` | MCP, A2A protocols, enterprise patterns |
+| `capstones/` | End-to-end projects combining all concepts |
+| `playground/` | Interactive Streamlit app |
+| `evaluations/` | Test suites and sanity checks |
+| `scripts/` | Reusable smoke test runner |
 
 ---
 
 ## ⚙️ Configuration
 
-Environment variables (optional):
-- `OLLAMA_BASE` (default: `http://localhost:11434`)
-- `OLLAMA_MODEL` (default: `llama3`)
-- `OLLAMA_EMBED_MODEL` (default: `nomic-embed-text`)
+All configuration is via environment variables. Defaults work out of the box with no changes needed.
 
-PowerShell:
+| Variable | Default | Purpose |
+|---|---|---|
+| `OLLAMA_BASE` | `http://localhost:11434` | Ollama server URL |
+| `OLLAMA_MODEL` | `llama3` | Chat/completion model |
+| `OLLAMA_EMBED_MODEL` | `nomic-embed-text` | Embedding model |
+
+Override in PowerShell:
 ```powershell
 $env:OLLAMA_MODEL = "llama3"
 $env:OLLAMA_EMBED_MODEL = "nomic-embed-text"
 ```
 
-Bash/zsh:
+Override in Bash/zsh:
 ```bash
 export OLLAMA_MODEL=llama3
 export OLLAMA_EMBED_MODEL=nomic-embed-text
@@ -84,29 +101,29 @@ export OLLAMA_EMBED_MODEL=nomic-embed-text
 
 ## 🎯 Capstone projects
 
-### 1) SQLite Analyst Agent (`capstone1_sql_agent`)
-Natural language → safe SQL (`SELECT`-only) → execution → explain plan → summary.
+### 1 · SQLite Analyst Agent
+> Natural language → safe SQL → execution → explain plan → summary
 
 ```bash
 python capstones/capstone1_sql_agent/cap1_app.py "List engineering employees with salary > 2000000"
 ```
 
-### 2) Research Agent (`capstone2_research_agent`)
-Planner/executor workflow with research-focused tools and PDF ingestion.
+### 2 · Research Agent
+> Planner/executor workflow with research tools and PDF ingestion
 
 ```bash
 python capstones/capstone2_research_agent/run.py "Survey methods for low-resource NER"
 ```
 
-### 3) Standalone RAG Agent (`capstone3_rag_agent`)
-Build a persistent index and run conversational retrieval.
+### 3 · Standalone RAG Agent
+> Ingest documents, build a persistent vector index, and query conversationally
 
-Build index:
+Build index first:
 ```bash
 python capstones/capstone3_rag_agent/build_index.py --data_dir capstones/capstone3_rag_agent/data --persist_dir capstones/capstone3_rag_agent/chroma_db
 ```
 
-Query agent:
+Then query:
 ```bash
 python capstones/capstone3_rag_agent/query_agent.py --persist_dir capstones/capstone3_rag_agent/chroma_db
 ```
@@ -114,6 +131,8 @@ python capstones/capstone3_rag_agent/query_agent.py --persist_dir capstones/caps
 ---
 
 ## 🎮 Playground
+
+An interactive Streamlit app to experiment with agent features without writing code:
 
 ```bash
 streamlit run playground/app.py
@@ -123,46 +142,43 @@ streamlit run playground/app.py
 
 ## 🧪 Testing and sanity checks
 
-### Standard tests
-Run all:
+### Run tests
+
+All tests:
 ```bash
 pytest -q
 ```
 
-Run selected:
+Focused suites:
 ```bash
 pytest evaluations/tests_unit -q
 pytest evaluations/tests_rag -q
 pytest evaluations/tests_agents -q
 ```
 
-### Reusable smoke command (recommended)
-Quick smoke (versions + files + imports + compile check):
+### Smoke test (run this before every session)
+
+Quick check — versions, files, imports, compile:
 ```bash
 python scripts/smoke_test.py
 ```
 
-Add pytest collection checks:
+With pytest collection + Ollama endpoint check:
 ```bash
-python scripts/smoke_test.py --with-pytest
+python scripts/smoke_test.py --with-pytest --with-ollama
 ```
 
-Add Ollama endpoint check:
-```bash
-python scripts/smoke_test.py --with-ollama
-```
-
-Run deterministic sample-suite sanity:
+Full deterministic sample suite:
 ```bash
 python scripts/smoke_test.py --with-samples
 ```
 
-Run live sample execution checks (LLM/tooling, longer):
+Live execution checks (uses LLM, takes longer):
 ```bash
 python scripts/smoke_test.py --with-live-samples --samples-timeout 180
 ```
 
-List configured sample checks:
+List all configured sample checks:
 ```bash
 python scripts/smoke_test.py --list-samples
 ```
@@ -176,14 +192,17 @@ PowerShell wrapper:
 
 ## 🛠️ Troubleshooting
 
-- **Connection refused**: start Ollama using `ollama serve`
-- **Model not found**: run `ollama pull llama3` and `ollama list`
-- **Import issues**: run `pip install --upgrade -r requirements.txt`
-- **Advanced model tags**: some demos use `llama3.1:latest`, `lfm2.5-thinking:latest`, or `llava`; pull them only when needed.
+| Symptom | Fix |
+|---|---|
+| `Connection refused` | Run `ollama serve` |
+| `Model not found` | Run `ollama pull llama3` then `ollama list` |
+| Import errors | Run `pip install --upgrade -r requirements.txt` |
+| Missing advanced model | Some demos need `llama3.1:latest`, `lfm2.5-thinking:latest`, or `llava` — pull on demand |
 
 ---
 
 ## 📝 Notes
 
-- Book manuscript/diagram authoring assets are intentionally excluded from this public repo.
-- Book content is maintained in the private `agenticai_book` repository.
+- Book manuscript and diagram assets are in the private `agenticai_book` repository and are intentionally excluded here.
+- All code runs fully locally — no OpenAI API key or cloud account required.
+
