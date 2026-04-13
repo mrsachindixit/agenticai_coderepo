@@ -1,4 +1,5 @@
 import argparse
+import compileall
 import importlib
 import os
 import platform
@@ -43,6 +44,16 @@ REQUIRED_IMPORTS = [
     "dotenv",
     "openai",
     "faiss",
+]
+
+SAMPLE_COMMANDS = [
+    [sys.executable, "capstones/capstone1_sql_agent/cap1_app.py", "--help"],
+    [sys.executable, "capstones/capstone2_research_agent/run.py", "--help"],
+    [sys.executable, "capstones/capstone3_rag_agent/build_index.py", "--help"],
+    [sys.executable, "capstones/capstone3_rag_agent/query_agent.py", "--help"],
+    [sys.executable, "-m", "pytest", "--collect-only", "-q", "evaluations/tests_unit"],
+    [sys.executable, "-m", "pytest", "--collect-only", "-q", "evaluations/tests_rag"],
+    [sys.executable, "-m", "pytest", "--collect-only", "-q", "evaluations/tests_agents"],
 ]
 
 
@@ -98,6 +109,16 @@ def check_imports(verbose: bool = False) -> bool:
     return good
 
 
+def check_python_sources_compile() -> bool:
+    info("Compiling Python sources (syntax sanity)")
+    ok_compile = compileall.compile_dir(str(ROOT), maxlevels=10, quiet=1)
+    if ok_compile:
+        ok("Python source compile sanity passed")
+        return True
+    fail("Python source compile sanity failed")
+    return False
+
+
 def run_pytest_collect() -> bool:
     cmd = [
         sys.executable,
@@ -135,10 +156,44 @@ def check_ollama(base: str) -> bool:
         return False
 
 
+def run_sample_commands(timeout_seconds: int = 60) -> bool:
+    info(f"Running sample command suite (timeout={timeout_seconds}s each)")
+    all_good = True
+    for cmd in SAMPLE_COMMANDS:
+        display = " ".join(cmd)
+        info(f"Sample: {display}")
+        result = subprocess.run(
+            cmd,
+            cwd=str(ROOT),
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+        )
+        if result.returncode == 0:
+            ok(f"Sample passed: {display}")
+        else:
+            fail(f"Sample failed: {display} (exit={result.returncode})")
+            if result.stdout:
+                print(result.stdout[-2000:])
+            if result.stderr:
+                print(result.stderr[-2000:])
+            all_good = False
+    return all_good
+
+
+def list_sample_commands() -> None:
+    info("Sample commands configured in smoke suite:")
+    for cmd in SAMPLE_COMMANDS:
+        print("  - " + " ".join(cmd))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Reusable smoke test for agenticai_repo")
     parser.add_argument("--with-pytest", action="store_true", help="Run pytest --collect-only checks")
     parser.add_argument("--with-ollama", action="store_true", help="Check Ollama endpoint reachability")
+    parser.add_argument("--with-samples", action="store_true", help="Run sample command sanity suite")
+    parser.add_argument("--samples-timeout", type=int, default=60, help="Timeout seconds per sample command")
+    parser.add_argument("--list-samples", action="store_true", help="List sample commands and exit")
     parser.add_argument("--ollama-base", default=os.getenv("OLLAMA_BASE", "http://localhost:11434"), help="Ollama base URL")
     parser.add_argument("--verbose", action="store_true", help="Verbose import output")
     return parser.parse_args()
@@ -146,12 +201,18 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+
+    if args.list_samples:
+        list_sample_commands()
+        return 0
+
     info(f"Platform: {platform.system()} {platform.release()}")
     info(f"Repo root: {ROOT}")
 
     checks = [
         check_python(),
         check_files(),
+        check_python_sources_compile(),
         check_imports(verbose=args.verbose),
     ]
 
@@ -160,6 +221,9 @@ def main() -> int:
 
     if args.with_pytest:
         checks.append(run_pytest_collect())
+
+    if args.with_samples:
+        checks.append(run_sample_commands(timeout_seconds=args.samples_timeout))
 
     all_good = all(checks)
     if all_good:

@@ -108,6 +108,16 @@ Include Ollama endpoint check:
 python scripts/smoke_test.py --with-ollama
 ```
 
+Run curated sample-command sanity suite:
+```bash
+python scripts/smoke_test.py --with-samples
+```
+
+List configured sample commands:
+```bash
+python scripts/smoke_test.py --list-samples
+```
+
 PowerShell wrapper:
 ```powershell
 .\scripts\smoke_test.ps1 -WithPytest -WithOllama
