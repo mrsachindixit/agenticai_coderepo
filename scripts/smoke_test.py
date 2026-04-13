@@ -47,13 +47,7 @@ REQUIRED_IMPORTS = [
 ]
 
 SAMPLE_COMMANDS = [
-    [sys.executable, "capstones/capstone1_sql_agent/cap1_app.py", "--help"],
-    [sys.executable, "capstones/capstone2_research_agent/run.py", "--help"],
-    [sys.executable, "capstones/capstone3_rag_agent/build_index.py", "--help"],
-    [sys.executable, "capstones/capstone3_rag_agent/query_agent.py", "--help"],
-    [sys.executable, "-m", "pytest", "--collect-only", "-q", "evaluations/tests_unit"],
-    [sys.executable, "-m", "pytest", "--collect-only", "-q", "evaluations/tests_rag"],
-    [sys.executable, "-m", "pytest", "--collect-only", "-q", "evaluations/tests_agents"],
+    [sys.executable, "-m", "pytest", "-q", "evaluations/tests_samples"],
 ]
 
 
@@ -156,9 +150,13 @@ def check_ollama(base: str) -> bool:
         return False
 
 
-def run_sample_commands(timeout_seconds: int = 60) -> bool:
-    info(f"Running sample command suite (timeout={timeout_seconds}s each)")
+def run_sample_commands(timeout_seconds: int = 60, live: bool = False) -> bool:
+    mode = "live" if live else "deterministic"
+    info(f"Running sample command suite ({mode}, timeout={timeout_seconds}s each)")
     all_good = True
+    env = os.environ.copy()
+    if live:
+        env["AGENTICAI_LIVE_SMOKE"] = "1"
     for cmd in SAMPLE_COMMANDS:
         display = " ".join(cmd)
         info(f"Sample: {display}")
@@ -168,6 +166,7 @@ def run_sample_commands(timeout_seconds: int = 60) -> bool:
             capture_output=True,
             text=True,
             timeout=timeout_seconds,
+            env=env,
         )
         if result.returncode == 0:
             ok(f"Sample passed: {display}")
@@ -192,6 +191,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--with-pytest", action="store_true", help="Run pytest --collect-only checks")
     parser.add_argument("--with-ollama", action="store_true", help="Check Ollama endpoint reachability")
     parser.add_argument("--with-samples", action="store_true", help="Run sample command sanity suite")
+    parser.add_argument("--with-live-samples", action="store_true", help="Run sample suite with AGENTICAI_LIVE_SMOKE=1")
     parser.add_argument("--samples-timeout", type=int, default=60, help="Timeout seconds per sample command")
     parser.add_argument("--list-samples", action="store_true", help="List sample commands and exit")
     parser.add_argument("--ollama-base", default=os.getenv("OLLAMA_BASE", "http://localhost:11434"), help="Ollama base URL")
@@ -223,7 +223,10 @@ def main() -> int:
         checks.append(run_pytest_collect())
 
     if args.with_samples:
-        checks.append(run_sample_commands(timeout_seconds=args.samples_timeout))
+        checks.append(run_sample_commands(timeout_seconds=args.samples_timeout, live=False))
+
+    if args.with_live_samples:
+        checks.append(run_sample_commands(timeout_seconds=args.samples_timeout, live=True))
 
     all_good = all(checks)
     if all_good:

@@ -113,6 +113,11 @@ Run curated sample-command sanity suite:
 python scripts/smoke_test.py --with-samples
 ```
 
+Run live sample execution checks (uses LLM/tooling and may take longer):
+```bash
+python scripts/smoke_test.py --with-live-samples --samples-timeout 180
+```
+
 List configured sample commands:
 ```bash
 python scripts/smoke_test.py --list-samples
