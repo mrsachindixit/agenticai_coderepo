@@ -92,6 +92,27 @@ pytest evaluations/tests_rag -q
 pytest evaluations/tests_agents -q
 ```
 
+### Reusable smoke test command
+Quick smoke (files + imports + versions):
+```bash
+python scripts/smoke_test.py
+```
+
+Include pytest collection checks:
+```bash
+python scripts/smoke_test.py --with-pytest
+```
+
+Include Ollama endpoint check:
+```bash
+python scripts/smoke_test.py --with-ollama
+```
+
+PowerShell wrapper:
+```powershell
+.\scripts\smoke_test.ps1 -WithPytest -WithOllama
+```
+
 ## Troubleshooting
 - **Connection refused**: start Ollama with `ollama serve`
 - **Model not found**: run `ollama pull llama3` and `ollama list`
