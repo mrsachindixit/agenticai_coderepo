@@ -96,6 +96,7 @@ pytest evaluations/tests_agents -q
 - **Connection refused**: start Ollama with `ollama serve`
 - **Model not found**: run `ollama pull llama3` and `ollama list`
 - **Import issues**: `pip install --upgrade -r requirements.txt`
+- **Advanced demo model tags**: some module scripts use `llama3.1:latest` or `lfm2.5-thinking:latest`; pull them if you run those specific demos.
 
 ## Notes
 - Book manuscript and diagram-authoring assets are intentionally excluded from this public repo.

@@ -1,23 +1,49 @@
-### Python Setup Steps
-1. Install the python3 (recommended version 3.11.3)
-2. Follow venv based approach to avoid breaking your other python application
-    a. Go to cmd
-    b. Create a folder named agentic-ai-workshop
-    c. Go to that folder
-    d. Run command : python -m venv test_env
-    e. Activate the venv : test_env\Scripts\activate
-    f. Download the requirements.txt and copy to agentic-ai-workshop folder
-    g. Run command : python install -r requirements.txt
+### Python setup
+1. Install Python 3.9+
+2. Create a virtual environment:
 
+```bash
+python -m venv .venv
+```
 
-### LLM Setup Steps
-1. Install ollama (LLM Provider) from https://ollama.com/download/ (Make sure you have at least 8 GB of RAM and 10 GB of free disk space for the model)
-2. Run command : ollama pull llama3.1:latest
-3. Run command : ollama run nomic-embed-text:latest
-4. Run command : ollama list
-5. Run command : ollama serve
+3. Activate the environment:
+    - Windows PowerShell:
 
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
 
-Once you are done we are good to start tomorrow. Eager to meet you all tomorrow !!!
+    - Linux/Mac:
 
-!!! Happy Learning !!!
+```bash
+source .venv/bin/activate
+```
+
+4. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Ollama setup
+1. Install Ollama from https://ollama.com/download/
+2. Pull required models:
+
+```bash
+ollama pull llama3
+ollama pull nomic-embed-text
+```
+
+3. Start Ollama:
+
+```bash
+ollama serve
+```
+
+### Optional models for advanced demos
+Some module demos use additional model tags. Pull these only if needed:
+
+```bash
+ollama pull llama3.1:latest
+ollama pull lfm2.5-thinking:latest
+```

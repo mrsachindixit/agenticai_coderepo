@@ -20,7 +20,7 @@ def _build_prompt(query: str, retrieved_texts: list, chat_history: list):
     return messages
 
 
-def load_chain(persist_dir: str):
+def load_chain(persist_dir: str, model: str | None = None):
     # Chroma with Ollama embedding function
     vectordb = Chroma(persist_directory=persist_dir, embedding_function=ollama_embed)
     retriever = vectordb.as_retriever(search_type="similarity", search_kwargs={"k": 4})
@@ -33,7 +33,7 @@ def load_chain(persist_dir: str):
         docs = retriever.get_relevant_documents(question)
         texts = [d.page_content if hasattr(d, 'page_content') else d for d in docs]
         messages = _build_prompt(question, texts, memory)
-        resp = ollama_chat(messages)
+        resp = ollama_chat(messages, model=model) if model else ollama_chat(messages)
         # store in memory
         memory.append((question, resp))
         return resp
@@ -59,7 +59,7 @@ def chat_loop(ask_fn):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--persist_dir", default="chroma_db")
-    parser.add_argument("--model", default=os.getenv("OPENAI_MODEL", "gpt-4o-mini"))
+    parser.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "llama3"))
     args = parser.parse_args()
 
     chain = load_chain(args.persist_dir, args.model)
