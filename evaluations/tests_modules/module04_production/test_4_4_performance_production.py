@@ -16,7 +16,7 @@ def _find_repo_root(start: Path) -> Path:
 
 
 ROOT = _find_repo_root(Path(__file__).resolve())
-TARGET = ROOT / "module04_production/4.4_pii_basic.py"
+TARGET = ROOT / "module04_production/4.4_performance_production.py"
 
 
 def test_target_exists() -> None:

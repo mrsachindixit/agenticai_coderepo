@@ -1,4 +1,4 @@
-﻿
+# Monitoring — Hand-Rolled JSON Logging
 
 import json
 import logging
@@ -11,8 +11,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 
 
 def estimate_tokens(text: str) -> int:
-    """Rough token estimate: ~4 chars per token for English text."""
-    return max(1, len(text) // 4)
+    return max(1, len(text) // 4)  # ~4 chars per token for English
 
 
 class SimpleLogger(BaseCallbackHandler):
@@ -21,34 +20,25 @@ class SimpleLogger(BaseCallbackHandler):
         self.req_id = str(uuid.uuid4())
         prompts = kwargs.get("prompts")
         prompt_preview = prompts[0][:200] if prompts else ""
-        token_est = estimate_tokens(prompts[0]) if prompts else 0
         log_entry = {
             "event": "llm_start",
             "req_id": self.req_id,
             "prompt_preview": prompt_preview,
-            "est_input_tokens": token_est,
+            "est_input_tokens": estimate_tokens(prompts[0]) if prompts else 0,
         }
         logging.info(json.dumps(log_entry))
 
     def on_llm_end(self, *args, **kwargs):
         elapsed = time.time() - self.start
-        log_entry = {
-            "event": "llm_end",
-            "req_id": self.req_id,
-            "elapsed_s": round(elapsed, 3),
-        }
+        log_entry = {"event": "llm_end", "req_id": self.req_id, "elapsed_s": round(elapsed, 3)}
         logging.info(json.dumps(log_entry))
 
     def on_llm_error(self, *args, **kwargs):
-        log_entry = {
-            "event": "llm_error",
-            "req_id": getattr(self, "req_id", "unknown"),
-        }
+        log_entry = {"event": "llm_error", "req_id": getattr(self, "req_id", "unknown")}
         logging.exception(json.dumps(log_entry))
 
 
 def log_tool_call(tool_name: str, payload: dict, result: str):
-    """Basic tool call logging hook."""
     logging.info("tool=%s payload=%s result_preview=%s", tool_name, payload, result[:200])
 
 
@@ -57,6 +47,4 @@ if __name__ == "__main__":
     resp = llm.invoke("In one line, what is an agent?")
     logging.info("Response: %s", resp.content)
 
-    # Example tool call logging
     log_tool_call("mock_tool", {"q": "agents"}, "ok")
-

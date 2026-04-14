@@ -16,7 +16,7 @@ def _find_repo_root(start: Path) -> Path:
 
 
 ROOT = _find_repo_root(Path(__file__).resolve())
-TARGET = ROOT / "module04_production/4.2_performance.py"
+TARGET = ROOT / "module04_production/4.6_monitoring_opentelemetry.py"
 
 
 def test_target_exists() -> None:
@@ -45,38 +45,3 @@ def test_target_runtime_smoke() -> None:
         f"stdout:\n{result.stdout[-2000:]}\n"
         f"stderr:\n{result.stderr[-2000:]}"
     )
-
-import functools
-import time
-
-
-def test_lru_cache_improvement() -> None:
-    @functools.lru_cache(maxsize=128)
-    def expensive_function(x: int) -> int:
-        time.sleep(0.01)
-        return x * 2
-
-    start = time.time()
-    result1 = expensive_function(5)
-    time1 = time.time() - start
-
-    start = time.time()
-    result2 = expensive_function(5)
-    time2 = time.time() - start
-
-    assert result1 == result2 == 10
-    assert time2 < time1 / 10
-
-
-def test_cache_stats() -> None:
-    @functools.lru_cache(maxsize=128)
-    def test_func(x: int) -> int:
-        return x + 1
-
-    test_func(1)
-    test_func(1)
-    test_func(2)
-
-    info = test_func.cache_info()
-    assert info.hits >= 1
-    assert info.misses >= 1
