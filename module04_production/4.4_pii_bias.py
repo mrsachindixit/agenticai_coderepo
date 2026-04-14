@@ -24,9 +24,15 @@ def is_sensitive_comparison(text: str) -> bool:
         return True
     return False
 
+def scan_output_for_pii(llm_response: str) -> str:
+    """Scan LLM output and redact any PII the model may have leaked."""
+    return redact(llm_response)
+
+
 BIAS_INSTRUCTIONS = (
     "Avoid stereotypes and be neutral. If a request seems biased, ask clarifying questions "
-    "and avoid harmful generalizations."
+    "and avoid harmful generalizations. Never include personal data like email addresses, "
+    "phone numbers, or credit card numbers in your responses."
 )
 
 if __name__ == "__main__":
@@ -39,4 +45,7 @@ if __name__ == "__main__":
             {"role": "system", "content": BIAS_INSTRUCTIONS},
             {"role": "user", "content": safe},
         ]
-        print(chat(messages, temperature=0.2))
+        response = chat(messages, temperature=0.2)
+        # Also scan the LLM output for any PII leakage
+        safe_response = scan_output_for_pii(response)
+        print(safe_response)

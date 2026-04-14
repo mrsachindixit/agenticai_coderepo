@@ -1,28 +1,50 @@
 ﻿
 
+import json
 import logging
 import time
 import uuid
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 from langchain.callbacks.base import BaseCallbackHandler
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+
+
+def estimate_tokens(text: str) -> int:
+    """Rough token estimate: ~4 chars per token for English text."""
+    return max(1, len(text) // 4)
+
 
 class SimpleLogger(BaseCallbackHandler):
     def on_llm_start(self, *args, **kwargs):
         self.start = time.time()
         self.req_id = str(uuid.uuid4())
-        logging.info("req_id=%s LLM start", self.req_id)
         prompts = kwargs.get("prompts")
-        if prompts:
-            logging.info("req_id=%s prompt_preview=%s", self.req_id, prompts[0][:200])
+        prompt_preview = prompts[0][:200] if prompts else ""
+        token_est = estimate_tokens(prompts[0]) if prompts else 0
+        log_entry = {
+            "event": "llm_start",
+            "req_id": self.req_id,
+            "prompt_preview": prompt_preview,
+            "est_input_tokens": token_est,
+        }
+        logging.info(json.dumps(log_entry))
 
     def on_llm_end(self, *args, **kwargs):
         elapsed = time.time() - self.start
-        logging.info("req_id=%s LLM end elapsed=%.2fs", self.req_id, elapsed)
+        log_entry = {
+            "event": "llm_end",
+            "req_id": self.req_id,
+            "elapsed_s": round(elapsed, 3),
+        }
+        logging.info(json.dumps(log_entry))
 
     def on_llm_error(self, *args, **kwargs):
-        logging.exception("req_id=%s LLM error", getattr(self, "req_id", "unknown"))
+        log_entry = {
+            "event": "llm_error",
+            "req_id": getattr(self, "req_id", "unknown"),
+        }
+        logging.exception(json.dumps(log_entry))
 
 
 def log_tool_call(tool_name: str, payload: dict, result: str):
