@@ -1,4 +1,4 @@
-### Multiple tools decide the tool based on user input
+﻿### Multiple tools decide the tool based on user input
 
 from langchain.tools import tool
 from langchain_ollama import ChatOllama
@@ -6,7 +6,7 @@ import requests
 from pydantic import BaseModel, Field
 
 model = ChatOllama(
-    model="llama3.1:latest",  # Note: or "lfm2.5-thinking:latest" for better reasoning
+    model="llama3.2:latest",  # Note: or "lfm2.5-thinking:latest" for better reasoning
     base_url='http://localhost:11434'
 )
 

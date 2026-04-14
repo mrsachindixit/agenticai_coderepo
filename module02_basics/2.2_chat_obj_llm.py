@@ -1,4 +1,4 @@
-
+﻿
 
 from openai import OpenAI
 
@@ -10,7 +10,7 @@ client = OpenAI(
 
 # Send a simple chat request to the LLM
 response = client.chat.completions.create(
-    model="llama3",  # Default model
+    model="llama3.2",  # Default model
     messages=[{
         "role": "user",
         "content": "In one paragraph, explain what an AI agent is to a new developer."

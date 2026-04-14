@@ -1,4 +1,4 @@
-# 🤖 AgenticAI — Hands-On Code Companion
+﻿# 🤖 AgenticAI — Hands-On Code Companion
 
 <p align="left">
 	<img src="https://img.shields.io/badge/Local--First-Ollama-10b981?style=for-the-badge" alt="Local First" />
@@ -51,13 +51,13 @@ pip install -r requirements.txt
 
 Minimum models to start:
 ```bash
-ollama pull llama3
+ollama pull llama3.2
 ollama pull nomic-embed-text
 ```
 
 Additional models used across advanced samples:
 ```bash
-ollama pull llama3.1:latest
+ollama pull llama3.2:latest
 ollama pull lfm2.5-thinking:latest
 ollama pull llava
 ```
@@ -106,18 +106,18 @@ All configuration is via environment variables. Defaults work out of the box.
 | Variable | Default | Purpose |
 |---|---|---|
 | `OLLAMA_BASE` | `http://localhost:11434` | Ollama server URL |
-| `OLLAMA_MODEL` | `llama3` | Chat/completion model |
+| `OLLAMA_MODEL` | `llama3.2` | Chat/completion model |
 | `OLLAMA_EMBED_MODEL` | `nomic-embed-text` | Embedding model |
 
 Override in PowerShell:
 ```powershell
-$env:OLLAMA_MODEL = "llama3"
+$env:OLLAMA_MODEL = "llama3.2"
 $env:OLLAMA_EMBED_MODEL = "nomic-embed-text"
 ```
 
 Override in Bash/zsh:
 ```bash
-export OLLAMA_MODEL=llama3
+export OLLAMA_MODEL=llama3.2
 export OLLAMA_EMBED_MODEL=nomic-embed-text
 ```
 
@@ -233,9 +233,9 @@ pytest evaluations/tests_samples -q
 | Symptom | Fix |
 |---|---|
 | `Connection refused` | Run `ollama serve` |
-| `Model not found` | Run `ollama pull llama3` then `ollama list` |
+| `Model not found` | Run `ollama pull llama3.2` then `ollama list` |
 | Import errors | Run `pip install --upgrade -r requirements.txt` |
-| Missing advanced model | Pull additional models as needed: `llama3.1:latest`, `lfm2.5-thinking:latest`, `llava` |
+| Missing advanced model | Pull additional models as needed: `llama3.2:latest`, `lfm2.5-thinking:latest`, `llava` |
 
 ---
 

@@ -1,4 +1,4 @@
-"""
+﻿"""
 LlamaIndex RAG — Compare with module01_raw/1.8_rag_basic
 =========================================================
 
@@ -38,7 +38,7 @@ from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
 
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 OLLAMA_EMBED = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
 
 # Global settings — every LlamaIndex component picks these up automatically

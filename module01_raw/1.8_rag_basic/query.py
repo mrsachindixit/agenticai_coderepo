@@ -1,4 +1,4 @@
-"""Query a RAG index: retrieve documents and augment LLM prompt with context."""
+﻿"""Query a RAG index: retrieve documents and augment LLM prompt with context."""
 
 import json
 import sys
@@ -98,7 +98,7 @@ def rag_answer(query, k=3):
     
     url = "http://localhost:11434/api/chat"
     payload = {
-        "model": "llama3.1:latest",  # Note: or "lfm2.5-thinking:latest" for better reasoning
+        "model": "llama3.2:latest",  # Note: or "lfm2.5-thinking:latest" for better reasoning
         "messages": messages,
         "stream": False
     }

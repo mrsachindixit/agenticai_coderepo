@@ -1,4 +1,4 @@
-
+﻿
 
 import requests
 
@@ -13,7 +13,7 @@ def capital_teller(country):
     
     url = "http://localhost:11434/api/chat"
     payload = {
-        "model": "llama3",
+        "model": "llama3.2",
         "messages": [
             {
                 "role": "system",

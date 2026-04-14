@@ -1,11 +1,11 @@
-
+﻿
 
 from langchain_ollama import ChatOllama
 from langchain.agents import create_agent
 from langchain.tools import tool
 
 llm = ChatOllama(
-    model="llama3.1:latest", base_url='http://localhost:11434', temperature=0)
+    model="llama3.2:latest", base_url='http://localhost:11434', temperature=0)
 
 
 @tool

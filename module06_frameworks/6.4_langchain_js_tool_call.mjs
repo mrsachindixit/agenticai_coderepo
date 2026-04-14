@@ -1,4 +1,4 @@
-/*
+﻿/*
 LangChain JS Tool Call (Ollama) — Conceptual twin of module03_langchain/3.1_tool_call.py
 =========================================================================================
 Do: npm install @langchain/ollama @langchain/core zod
@@ -11,7 +11,7 @@ import { ToolMessage } from "@langchain/core/messages";
 import { z } from "zod";
 
 const OLLAMA_BASE = process.env.OLLAMA_BASE ?? "http://localhost:11434";
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? "llama3.1:latest";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? "llama3.2:latest";
 
 const model = new ChatOllama({
   baseUrl: OLLAMA_BASE,

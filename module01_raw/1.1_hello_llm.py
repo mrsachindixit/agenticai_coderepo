@@ -1,4 +1,4 @@
-
+﻿
 
 import requests
 
@@ -37,7 +37,7 @@ url = "http://localhost:11434/api/generate"
 prompt = "What is the capital of France?"
 
 payload = {
-    "model": "llama3",  # Default model
+    "model": "llama3.2",  # Default model
     "prompt": prompt,
     "stream": False
 }

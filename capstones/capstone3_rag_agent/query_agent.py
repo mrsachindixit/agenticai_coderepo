@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 from langchain.vectorstores import Chroma
 from utils import get_env
 from utils.ollama_client import chat as ollama_chat, embed as ollama_embed
@@ -59,7 +59,7 @@ def chat_loop(ask_fn):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--persist_dir", default="chroma_db")
-    parser.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "llama3"))
+    parser.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "llama3.2"))
     args = parser.parse_args()
 
     chain = load_chain(args.persist_dir, args.model)

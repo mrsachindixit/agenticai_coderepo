@@ -1,4 +1,4 @@
-
+﻿
 
 import subprocess
 import sys
@@ -6,7 +6,7 @@ import tempfile
 
 from langchain_ollama import ChatOllama
 
-llm = ChatOllama(model="llama3", base_url="http://localhost:11434/", temperature=0.1)
+llm = ChatOllama(model="llama3.2", base_url="http://localhost:11434/", temperature=0.1)
 
 def step_requirements(reqs):
     """Business logic: Parse requirements (placeholder)."""

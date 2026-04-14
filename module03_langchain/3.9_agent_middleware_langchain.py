@@ -1,4 +1,4 @@
- 
+﻿ 
 import re
 from langchain_ollama import ChatOllama
 from langchain.agents import create_agent
@@ -8,9 +8,9 @@ from langchain.agents.middleware import AgentMiddleware, AgentState
 from langchain_core.messages import HumanMessage
 
 # 1. Configure the model
-# Use a capable model like llama3 or "lfm2.5-thinking:latest" for better reasoning
+# Use a capable model like llama3.2 or "lfm2.5-thinking:latest" for better reasoning
 model = ChatOllama(
-    model="llama3.1:latest",
+    model="llama3.2:latest",
     base_url='http://localhost:11434'
 )
 class SecretMaskerMiddleware(AgentMiddleware):

@@ -1,4 +1,4 @@
-
+﻿
 
 import functools
 import os
@@ -7,7 +7,7 @@ import requests
 
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
 
-def stream_generate(prompt, model="llama3"):
+def stream_generate(prompt, model="llama3.2"):
     """Stream tokens from Ollama for faster perceived latency."""
     url = f"{OLLAMA_BASE}/api/generate"
     payload = {"model": model, "prompt": prompt, "stream": True}
@@ -61,7 +61,7 @@ def batch_embeddings(texts):
 
 if __name__ == "__main__":
     start = time.time()
-    stream_generate("Explain retrieval augmented generation in 5 bullet points.", model="llama3")
+    stream_generate("Explain retrieval augmented generation in 5 bullet points.", model="llama3.2")
     print("\nTime:", time.time() - start)
 
     # Cached embeddings (repeated text will be fast)

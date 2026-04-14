@@ -1,4 +1,4 @@
-
+﻿
 from langchain_ollama import ChatOllama
 from langchain_ollama import OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -36,7 +36,7 @@ Question: {question}
 Answer:"""
     # Updated: Use PromptTemplate from langchain_core.prompts
     prompt = PromptTemplate.from_template(template)
-    llm = ChatOllama(model="llama3.1:latest", temperature=0.2)
+    llm = ChatOllama(model="llama3.2:latest", temperature=0.2)
 
     def format_docs(docs):
         return "\n\n".join(doc.page_content if hasattr(doc, 'page_content') else str(doc) for doc in docs)

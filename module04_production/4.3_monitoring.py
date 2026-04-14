@@ -1,4 +1,4 @@
-
+﻿
 
 import logging
 import time
@@ -31,7 +31,7 @@ def log_tool_call(tool_name: str, payload: dict, result: str):
 
 
 if __name__ == "__main__":
-    llm = ChatOllama(model="llama3", temperature=0.2, callbacks=[SimpleLogger()])
+    llm = ChatOllama(model="llama3.2", temperature=0.2, callbacks=[SimpleLogger()])
     resp = llm.invoke("In one line, what is an agent?")
     logging.info("Response: %s", resp.content)
 

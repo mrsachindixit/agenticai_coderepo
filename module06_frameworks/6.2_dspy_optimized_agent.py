@@ -1,4 +1,4 @@
-"""
+﻿"""
 DSPy Optimized Tool Agent — Compare with module01_raw/1.4_tool_single
 ======================================================================
 
@@ -32,7 +32,7 @@ import dspy
 # 1. Configure DSPy to use local Ollama
 # ---------------------------------------------------------------------------
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 lm = dspy.LM(
     model=f"ollama_chat/{OLLAMA_MODEL}",

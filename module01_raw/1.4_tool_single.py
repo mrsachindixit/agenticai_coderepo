@@ -1,4 +1,4 @@
-
+﻿
 
 import requests
 
@@ -42,7 +42,7 @@ def run_agent(user_message):
 
     print("— Asking Ollama...")
     res = requests.post("http://localhost:11434/api/chat", json={
-        "model": "llama3",
+        "model": "llama3.2",
         "messages": messages,
         "tools": tools,
         "stream": False
@@ -65,7 +65,7 @@ def run_agent(user_message):
         
         print("\n— Sending results back to Ollama for final answer...")
         final_res = requests.post("http://localhost:11434/api/chat", json={
-            "model": "llama3",
+            "model": "llama3.2",
             "messages": messages,
             "stream": False
         }).json()
