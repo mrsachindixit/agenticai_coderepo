@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 import py_compile
@@ -16,7 +16,7 @@ def _find_repo_root(start: Path) -> Path:
 
 
 ROOT = _find_repo_root(Path(__file__).resolve())
-TARGET = ROOT / "module03_langchain/3.5_memory_buffer_memory_langchain.py"
+TARGET = ROOT / "module02_basics/2.2_image_analysis.py"
 
 
 def test_target_exists() -> None:

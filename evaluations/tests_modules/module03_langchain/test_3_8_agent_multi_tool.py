@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 import py_compile
@@ -16,7 +16,7 @@ def _find_repo_root(start: Path) -> Path:
 
 
 ROOT = _find_repo_root(Path(__file__).resolve())
-TARGET = ROOT / "module01_raw/1.8_rag_basic/query.py"
+TARGET = ROOT / "module03_langchain/3.8_agent_multi_tool.py"
 
 
 def test_target_exists() -> None:

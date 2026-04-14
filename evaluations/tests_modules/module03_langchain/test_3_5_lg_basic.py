@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 import py_compile
@@ -16,7 +16,7 @@ def _find_repo_root(start: Path) -> Path:
 
 
 ROOT = _find_repo_root(Path(__file__).resolve())
-TARGET = ROOT / "module03_langchain/3.11_multi_tool_orchestration.py"
+TARGET = ROOT / "module03_langchain/3.5_lg_basic.py"
 
 
 def test_target_exists() -> None:
@@ -45,26 +45,3 @@ def test_target_runtime_smoke() -> None:
         f"stdout:\n{result.stdout[-2000:]}\n"
         f"stderr:\n{result.stderr[-2000:]}"
     )
-
-import json
-
-
-def controller_out(model_out: str):
-    try:
-        proposal = json.loads(model_out)
-        tool = proposal.get("tool")
-        args = proposal.get("args", {})
-        if tool == "add":
-            return args.get("a", 0) + args.get("b", 0)
-    except json.JSONDecodeError:
-        return model_out
-
-
-def test_agent_controller_tool_json_parsed() -> None:
-    model_output = json.dumps({"tool": "add", "args": {"a": 2, "b": 3}})
-    assert controller_out(model_output) == 5
-
-
-def test_agent_controller_direct_answer_passthrough() -> None:
-    model_output = "No tool needed."
-    assert controller_out(model_output) == model_output
