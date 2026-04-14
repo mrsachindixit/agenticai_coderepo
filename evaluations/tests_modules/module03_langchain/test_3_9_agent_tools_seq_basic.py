@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 import py_compile
@@ -16,7 +16,7 @@ def _find_repo_root(start: Path) -> Path:
 
 
 ROOT = _find_repo_root(Path(__file__).resolve())
-TARGET = ROOT / "module01_raw/1.5_tools_multi.py"
+TARGET = ROOT / "module03_langchain/3.9_agent_tools_seq_basic.py"
 
 
 def test_target_exists() -> None:

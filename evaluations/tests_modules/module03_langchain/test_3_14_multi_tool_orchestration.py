@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 import py_compile
@@ -16,7 +16,7 @@ def _find_repo_root(start: Path) -> Path:
 
 
 ROOT = _find_repo_root(Path(__file__).resolve())
-TARGET = ROOT / "module01_raw/1.8_rag_basic/build_index.py"
+TARGET = ROOT / "module03_langchain/3.14_multi_tool_orchestration.py"
 
 
 def test_target_exists() -> None:
@@ -47,33 +47,24 @@ def test_target_runtime_smoke() -> None:
     )
 
 import json
-import sys
-
-import numpy as np
-
-INDEX_FILE = ROOT / "module01_raw/1.8_rag_basic/index.json"
-
-sys.path.append(str(ROOT))
-from utils.ollama_client import embed
 
 
-def cosine(a, b) -> float:
-    a_arr = np.array(a)
-    b_arr = np.array(b)
-    return float(a_arr @ b_arr) / (np.linalg.norm(a_arr) * np.linalg.norm(b_arr) + 1e-9)
+def controller_out(model_out: str):
+    try:
+        proposal = json.loads(model_out)
+        tool = proposal.get("tool")
+        args = proposal.get("args", {})
+        if tool == "add":
+            return args.get("a", 0) + args.get("b", 0)
+    except json.JSONDecodeError:
+        return model_out
 
 
-@pytest.mark.skipif(not INDEX_FILE.exists(), reason="Run module01_raw/1.8_rag_basic/build_index.py to create the RAG index")
-def test_rag_index_exists_for_basic_flow() -> None:
-    assert INDEX_FILE.exists(), "Expected RAG index at module01_raw/1.8_rag_basic/index.json"
+def test_agent_controller_tool_json_parsed() -> None:
+    model_output = json.dumps({"tool": "add", "args": {"a": 2, "b": 3}})
+    assert controller_out(model_output) == 5
 
 
-@pytest.mark.skipif(not INDEX_FILE.exists(), reason="Run module01_raw/1.8_rag_basic/build_index.py to create the RAG index")
-def test_rag_retrieval_semantics_basic() -> None:
-    with open(INDEX_FILE, "r", encoding="utf-8") as file_handle:
-        index_data = json.load(file_handle)
-
-    query = "How do agents use tools and memory?"
-    query_vector = embed(query)[0]
-    scores = [cosine(query_vector, record["vec"]) for record in index_data]
-    assert max(scores) > 0.2
+def test_agent_controller_direct_answer_passthrough() -> None:
+    model_output = "No tool needed."
+    assert controller_out(model_output) == model_output
