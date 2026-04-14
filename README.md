@@ -47,10 +47,24 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4) Pull local models
+### 4) Pull local models (minimum + full course set)
+
+Minimum models to start:
 ```bash
 ollama pull llama3
 ollama pull nomic-embed-text
+```
+
+Additional models used across advanced samples:
+```bash
+ollama pull llama3.1:latest
+ollama pull lfm2.5-thinking:latest
+ollama pull llava
+```
+
+Check installed models anytime:
+```bash
+ollama list
 ```
 
 ### 5) Start Ollama
@@ -111,42 +125,29 @@ export OLLAMA_EMBED_MODEL=nomic-embed-text
 
 ## 🏁 Capstone Assignments
 
-Treat each capstone as a practical assignment with a clear objective, deliverable, and run check.
+Treat each capstone as a student assignment.
+
+The intended flow is:
+1. Read the problem statement.
+2. Implement your own solution first.
+3. Use the repository implementation later as a reference for comparison and study.
 
 ### Assignment 1 — SQLite Analyst Agent
-**Objective:** Convert natural-language business questions into safe, executable SQL.
+**Problem statement:** Build an agent that converts natural-language business questions into safe, executable SQL.
 
-**Deliverable:** An answer including query intent, SQL execution result, and summary.
-
-**Run check:**
-```bash
-python capstones/capstone1_sql_agent/cap1_app.py "List engineering employees with salary > 2000000"
-```
+**Expected student outcome:** Query intent explanation, SQL execution result, and final business summary.
 
 ### Assignment 2 — Research Agent
-**Objective:** Orchestrate planner/executor steps to produce concise research output.
+**Problem statement:** Build a planner/executor-style research agent that gathers evidence and produces a concise synthesis.
 
-**Deliverable:** A structured response based on tool-driven evidence collection.
-
-**Run check:**
-```bash
-python capstones/capstone2_research_agent/run.py "Survey methods for low-resource NER"
-```
+**Expected student outcome:** Structured output with evidence-backed conclusions.
 
 ### Assignment 3 — Standalone RAG Agent
-**Objective:** Build and query a local retrieval index over your documents.
+**Problem statement:** Build a standalone RAG pipeline that ingests local documents, builds an index, and answers grounded queries.
 
-**Deliverable:** Reproducible ingest/index workflow and grounded answers.
+**Expected student outcome:** Reproducible ingest/index pipeline and grounded responses with source awareness.
 
-**Run check (step 1: build index):**
-```bash
-python capstones/capstone3_rag_agent/build_index.py --data_dir capstones/capstone3_rag_agent/data --persist_dir capstones/capstone3_rag_agent/chroma_db
-```
-
-**Run check (step 2: query):**
-```bash
-python capstones/capstone3_rag_agent/query_agent.py --persist_dir capstones/capstone3_rag_agent/chroma_db
-```
+Reference implementations are available in `capstones/` after you attempt the assignments independently.
 
 ---
 
