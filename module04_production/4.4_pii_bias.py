@@ -1,17 +1,38 @@
-"""PII Detection & Bias Guardrails — Naive Regex vs Production-Grade Presidio
+"""PII Detection & Bias Guardrails — Three Tiers of PII Detection
 
-This module demonstrates TWO approaches to PII handling:
+This module demonstrates THREE approaches to PII handling, each a step up
+in accuracy and production-readiness:
 
-  1. NAIVE REGEX  — hand-rolled patterns (fast to prototype, misses edge cases)
-  2. PRESIDIO     — Microsoft's open-source NLP-powered PII framework
-                    (50+ entity types, pluggable recognizers, production-ready)
+  1. NAIVE REGEX          — hand-rolled patterns (fast to prototype, misses
+                            names, addresses, dates-of-birth, and many
+                            locale-specific formats).
+
+  2. PRESIDIO + spaCy     — Microsoft's open-source PII framework using
+                            spaCy NER backend (50+ entity types, regex +
+                            NLP hybrid, production-ready).
+
+  3. PRESIDIO + TRANSFORMER MODEL — same Presidio pipeline, but the NER
+                            backend is swapped to a HuggingFace transformer
+                            fine-tuned for de-identification.  Higher
+                            accuracy, especially for names, medical data,
+                            and multilingual text.
+
+     Popular PII / de-identification models:
+       • dslim/bert-base-NER               — BERT-based general NER
+       • obi/deid_roberta_i2b2             — RoBERTa fine-tuned on clinical text
+       • StanfordAIMI/stanford-deidentifier-base — Stanford de-id model
+       • urchade/gliner_multi_pii-v1        — GLiNER multilingual PII
 
 In real applications, never ship approach #1 alone.  It exists here only so
 students understand WHY a library like Presidio is necessary.
 
-Install Presidio (one-time):
+Install Presidio + spaCy (one-time):
     pip install presidio-analyzer presidio-anonymizer
     python -m spacy download en_core_web_lg
+
+Install Presidio + Transformers (one-time):
+    pip install "presidio-analyzer[transformers]" presidio-anonymizer
+    python -m spacy download en_core_web_sm      # lightweight tokeniser
 """
 
 import re
@@ -23,11 +44,32 @@ try:
     from presidio_anonymizer import AnonymizerEngine
     from presidio_anonymizer.entities import OperatorConfig
 
-    _analyzer = AnalyzerEngine()
+    _analyzer = AnalyzerEngine()          # default spaCy NER backend
     _anonymizer = AnonymizerEngine()
     PRESIDIO_AVAILABLE = True
 except ImportError:
     PRESIDIO_AVAILABLE = False
+
+# ── Optional: transformer-backed Presidio engine ──
+try:
+    from presidio_analyzer.nlp_engine import TransformersNlpEngine
+
+    # Uses a lightweight spaCy model for tokenisation only;
+    # the heavy NER lifting is done by the BERT transformer model.
+    _transformer_model_config = [
+        {
+            "lang_code": "en",
+            "model_name": {
+                "spacy": "en_core_web_sm",                  # tokeniser
+                "transformers": "dslim/bert-base-NER",      # NER model
+            },
+        }
+    ]
+    _transformer_nlp_engine = TransformersNlpEngine(models=_transformer_model_config)
+    _transformer_analyzer = AnalyzerEngine(nlp_engine=_transformer_nlp_engine)
+    TRANSFORMERS_AVAILABLE = True
+except Exception:
+    TRANSFORMERS_AVAILABLE = False
 
 
 # =====================================================================
@@ -91,11 +133,59 @@ def redact_presidio(text: str, language: str = "en") -> str:
 
 
 # =====================================================================
+# APPROACH 3 — Presidio + Transformer NER model (highest accuracy)
+# =====================================================================
+
+def redact_transformer(text: str, language: str = "en") -> str:
+    """Detect and anonymize PII using a HuggingFace transformer NER model.
+
+    Instead of spaCy's statistical NER, this swaps in a BERT / RoBERTa
+    model fine-tuned on NER or de-identification data.  The rest of
+    Presidio's pipeline (regex recognizers, anonymizer operators) stays
+    the same — only the NER backbone changes.
+
+    Popular model choices (set in _transformer_model_config above):
+      • dslim/bert-base-NER              — general-purpose NER
+      • obi/deid_roberta_i2b2            — clinical de-identification
+      • StanfordAIMI/stanford-deidentifier-base
+    """
+    if not PRESIDIO_AVAILABLE:
+        print("[WARN] Presidio not installed — falling back to regex.")
+        return redact_regex(text)
+    if not TRANSFORMERS_AVAILABLE:
+        print("[WARN] Transformers engine not available — falling back to spaCy Presidio.")
+        return redact_presidio(text, language)
+
+    results = _transformer_analyzer.analyze(text=text, language=language)
+
+    operators = {
+        "DEFAULT": OperatorConfig("replace", {"new_value": "[REDACTED]"}),
+        "PERSON": OperatorConfig("replace", {"new_value": "[NAME_REDACTED]"}),
+        "EMAIL_ADDRESS": OperatorConfig("replace", {"new_value": "[EMAIL_REDACTED]"}),
+        "PHONE_NUMBER": OperatorConfig("replace", {"new_value": "[PHONE_REDACTED]"}),
+        "CREDIT_CARD": OperatorConfig("mask", {
+            "masking_char": "*",
+            "chars_to_mask": 12,
+            "from_end": False,
+        }),
+    }
+
+    anonymized = _anonymizer.anonymize(
+        text=text,
+        analyzer_results=results,
+        operators=operators,
+    )
+    return anonymized.text
+
+
+# =====================================================================
 # Unified helpers — use Presidio when available, regex as fallback
 # =====================================================================
 
 def redact(text: str) -> str:
-    """Best-available PII redaction: Presidio if installed, else regex."""
+    """Best-available PII redaction: transformer > spaCy Presidio > regex."""
+    if TRANSFORMERS_AVAILABLE:
+        return redact_transformer(text)
     return redact_presidio(text) if PRESIDIO_AVAILABLE else redact_regex(text)
 
 
@@ -144,16 +234,36 @@ if __name__ == "__main__":
 
     print()
     print("=" * 60)
-    print("APPROACH 2 — Presidio (NLP + regex hybrid)")
+    print("APPROACH 2 — Presidio + spaCy NER")
     print("=" * 60)
     print(redact_presidio(sample))
 
+    print()
+    print("=" * 60)
+    print("APPROACH 3 — Presidio + Transformer NER model")
+    print("=" * 60)
+    print(redact_transformer(sample))
+
+    # Show entity detection comparison
     if PRESIDIO_AVAILABLE:
-        # Show what Presidio detected (entity types + positions)
         print()
-        print("Presidio detected entities:")
-        for r in _analyzer.analyze(text=sample, language="en"):
+        print("=" * 60)
+        print("Entity detection — spaCy vs Transformer")
+        print("=" * 60)
+
+        spacy_results = _analyzer.analyze(text=sample, language="en")
+        print("spaCy entities:")
+        for r in spacy_results:
             print(f"  {r.entity_type:20s}  score={r.score:.2f}  '{sample[r.start:r.end]}'")
+
+        if TRANSFORMERS_AVAILABLE:
+            print()
+            transformer_results = _transformer_analyzer.analyze(text=sample, language="en")
+            print("Transformer (dslim/bert-base-NER) entities:")
+            for r in transformer_results:
+                print(f"  {r.entity_type:20s}  score={r.score:.2f}  '{sample[r.start:r.end]}'")
+        else:
+            print("\n  [Transformer engine not installed — see install instructions above]")
 
     print()
     print("=" * 60)
