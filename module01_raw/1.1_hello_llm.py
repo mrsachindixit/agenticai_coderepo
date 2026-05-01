@@ -37,12 +37,13 @@ url = "http://localhost:11434/api/generate"
 prompt = "What is the capital of France?"
 
 payload = {
-    "model": "llama3.2",  # Default model
+    "model": "llama3.1:latest",  # Default model
     "prompt": prompt,
     "stream": False
 }
+print(f"User: {prompt}")
 response = requests.post(url, json=payload)
 
-print(response.json().get("response", ""))
+print(f"Assistant: {response.json().get('response', '')}")
 
 

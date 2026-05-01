@@ -57,9 +57,9 @@ def run_agent(user_message):
         {"role": "user", "content": user_message}
     ]
     
-    print("— Asking Ollama...")
+    print(f"— Asking about user query to assistant...")
     res = requests.post("http://localhost:11434/api/chat", json={
-        "model": "llama3.2",
+        "model": "lfm2.5-thinking:latest",
         "messages": messages,
         "tools": tools,
         "stream": False
@@ -73,22 +73,23 @@ def run_agent(user_message):
             function_name = tool_call["function"]["name"]
             city = tool_call["function"]["arguments"]["city"]
             
-            print(f"— Tool Call Triggered: {function_name}({city})")
+            
             
             # Execute appropriate tool
             if function_name == "get_weather":
+                print(f"— Tool Call Triggered for getting weather of {city}")
                 result = get_weather(city)
             elif function_name == "get_pincode":
+                print(f"— Tool Call Triggered for getting pincode of {city}")
                 result = get_pincode(city)
             else:
                 result = "Unknown tool"
             
-            print(f"— Result: {result}")
             messages.append({"role": "tool", "tool_name": function_name, "content": result})
-    
-    print("\n— Sending results back to Ollama for final answer...")
+        print(f"— Tool response received. Assistant now processing the response for final answer...")
+        
     final_res = requests.post("http://localhost:11434/api/chat", json={
-        "model": "llama3.2",
+        "model": "lfm2.5-thinking:latest",
         "messages": messages,
         "stream": False
     }).json()

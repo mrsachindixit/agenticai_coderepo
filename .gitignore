@@ -5,3 +5,6 @@ stoshniwal/**
 test_code/**
 **/index.json
 **/sample.db
+**/examples-code
+.vscode/**
+requirements.short.txt

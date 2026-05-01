@@ -98,7 +98,7 @@ def rag_answer(query, k=3):
     
     url = "http://localhost:11434/api/chat"
     payload = {
-        "model": "llama3.2:latest",  # Note: or "lfm2.5-thinking:latest" for better reasoning
+        "model": "llama3.1:latest",  # Note: or "lfm2.5-thinking:latest" for better reasoning
         "messages": messages,
         "stream": False
     }
@@ -113,6 +113,7 @@ if __name__ == "__main__":
     answer = rag_answer(query_text, k=3)
     print("Answer:")
     print(answer)
+    print("\n" + "="*60 + "\n")
 
     query_text = "Tell me about history of Pune"
     print(f"Query: {query_text}")
@@ -120,6 +121,7 @@ if __name__ == "__main__":
     answer = rag_answer(query_text, k=3)
     print("Answer:")
     print(answer)
+    print("\n" + "="*60 + "\n")
 
     query_text = "If I go on heritage walk in Pune with Sachin, which places he would show me?"
     print(f"Query: {query_text}")
@@ -127,3 +129,4 @@ if __name__ == "__main__":
     answer = rag_answer(query_text, k=3)
     print("Answer:")
     print(answer)
+    print("\n" + "="*60 + "\n")

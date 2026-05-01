@@ -9,11 +9,10 @@ def capital_teller(country):
     Args:
         country: Country name to get capital for
     """
-    print(f"Looking up capital of {country}...")
     
     url = "http://localhost:11434/api/chat"
     payload = {
-        "model": "llama3.2",
+        "model": "llama3.1:latest",
         "messages": [
             {
                 "role": "system",
@@ -26,7 +25,7 @@ def capital_teller(country):
         ],
         "stream": False
     }
-    
+    print(f"Assistant looking up capital for {country}...")
     response = requests.post(url, json=payload)
     result = response.json()
     capital = result.get("message", {}).get("content", "")
