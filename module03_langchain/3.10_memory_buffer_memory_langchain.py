@@ -5,7 +5,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 # 1. Configure the model
 # Use a capable model like GPT-4o-mini for efficient agentic reasoning
-model = ChatOllama(model="llama3.2:latest", base_url='http://localhost:11434')
+model = ChatOllama(model="llama3.1:latest", base_url='http://localhost:11434')
 
 # 2. Define tools (optional, but agents are useful with them)
 # For this simple example, we'll use an empty list

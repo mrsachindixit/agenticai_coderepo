@@ -57,7 +57,7 @@ def run_sql(sql: str):
 
 url = "http://localhost:11434/api/chat"
 payload = {
-    "model": "llama3.2",
+    "model": "llama3.1:latest",
     "stream": False
 }
 
@@ -70,6 +70,8 @@ if __name__ == "__main__":
         Step 1: Generate safe SQL from natural language
         Step 2: Execute and summarize
         """
+        print(f"User : {task}")
+        print(f"— Step 1 : Asking assistant to generate SQL\n")
         schema = "Table employees(id, name, dept, salary)"
         
         # Step 1: Ask LLM to generate SQL
@@ -103,7 +105,7 @@ Task: {task}
         payload["messages"] = messages
         response = requests.post(url, json=payload)
         model_response_text = response.json().get("message", {}).get("content", "")
-        print("Step 1 - Generated SQL:\n", model_response_text)
+        # print("Step 1 - Generated SQL:\n", model_response_text)
         
         # Parse JSON from response
         match = re.search(r'(?s)```json\s*(\{.*?\})\s*```', model_response_text)
@@ -112,25 +114,27 @@ Task: {task}
         
         try:
             sql = json.loads(model_response_text)["sql"]
-            print(f"Parsed SQL: {sql}\n")
+            # print(f"Parsed SQL: {sql}\n")
         except Exception as e:
             print(f"Parse failed ({e}), using fallback\n")
             sql = "SELECT * FROM employees LIMIT 5"
         
         # Step 2: Execute SQL
+        print(f"— Step 2 : Executing SQL : {sql}\n")
         result = run_sql(sql)
-        print(f"Query Result:\n{result}\n")
+        # print(f"Result :\n{result}\n")
         
         # Step 3: Ask LLM to summarize
-        messages += [
-            {"role": "user", "content": f"SQL result: {result}"},
-            {"role": "user", "content": "Summarize this result in 1-2 sentences."}
+        print(f"— Step 3 : Summarizing SQL result\n")
+        messages = [
+            {"role": "system", "content": f"You need to answer the user's query based on data retrieved from SQL database.\n Summarize the result of this query in 2-3 sentences.\n Only summarize the results don't mention anything about attributes not returned in sql query"},
+            {"role": "user", "content": f"User Query : {task} \n SQL query result: {result}"}
         ]
         
         payload["messages"] = messages
         response = requests.post(url, json=payload)
         summary = response.json().get("message", {}).get("content", "")
-        print(f"Step 3 - Summary:\n{summary}\n")
+        print(f"Assistant : {summary}\n")
         print("=" * 60 + "\n")
 
     # Test cases

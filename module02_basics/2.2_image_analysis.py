@@ -28,7 +28,7 @@ def analyze_image(image_path: str, question: str) -> str:
     }
     
     # Step 3: Call vision model via chat API
-    response = chat(messages=[message], model="llava")
+    response = chat(messages=[message], model="llava:latest")
     return response
 
 

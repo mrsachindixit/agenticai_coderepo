@@ -40,9 +40,9 @@ def run_agent(user_message):
         }
     ]
 
-    print("— Asking Ollama...")
+    print(f"— Asking about user query to assistant...")
     res = requests.post("http://localhost:11434/api/chat", json={
-        "model": "llama3.2",
+        "model": "lfm2.5-thinking:latest",
         "messages": messages,
         "tools": tools,
         "stream": False
@@ -53,19 +53,19 @@ def run_agent(user_message):
         tool_call = res["message"]["tool_calls"][0]
         city = tool_call["function"]["arguments"]["city"]
         
-        print(f"— Tool Call Triggered for: {city}")
+        print(f"— Tool Call Triggered for getting weather of {city}")
         
         # Execute the actual weather fetch
         weather_info = get_weather(city)
-        print(f"— Real API Result: {weather_info}")
+        print(f"— The weather info received : {weather_info}")
 
         # 4. Send the result back to Ollama for the final answer
         messages.append(res["message"])  # Add the model's request
         messages.append({"role": "tool", "content": weather_info})  # Add our result
         
-        print("\n— Sending results back to Ollama for final answer...")
+        print("\n— Processing the response...")
         final_res = requests.post("http://localhost:11434/api/chat", json={
-            "model": "llama3.2",
+            "model": "lfm2.5-thinking:latest",
             "messages": messages,
             "stream": False
         }).json()
@@ -77,6 +77,6 @@ def run_agent(user_message):
 
 if __name__ == "__main__":
     user_question = "What's the weather in Bogotá, Colombia in celsius?"
-    print(f"User: {user_question}\n")
+    print(f"User : {user_question}\n")
     answer = run_agent(user_question)
-    print(f"Agent: {answer}")
+    print(f"Final Answer : {answer}")

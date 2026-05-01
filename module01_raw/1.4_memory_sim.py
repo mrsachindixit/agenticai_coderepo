@@ -4,7 +4,7 @@ import requests
 
 url = "http://localhost:11434/api/chat"
 payload = {
-    "model": "llama3.2",
+    "model": "llama3.1:latest",
     "stream": False
 }
 

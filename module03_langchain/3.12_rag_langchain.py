@@ -36,7 +36,7 @@ Question: {question}
 Answer:"""
     # Updated: Use PromptTemplate from langchain_core.prompts
     prompt = PromptTemplate.from_template(template)
-    llm = ChatOllama(model="llama3.2:latest", temperature=0.2)
+    llm = ChatOllama(model="llama3.1:latest", temperature=0.2)
 
     def format_docs(docs):
         return "\n\n".join(doc.page_content if hasattr(doc, 'page_content') else str(doc) for doc in docs)
@@ -67,6 +67,7 @@ if __name__ == "__main__":
     answer = rag_chain(query_text)
     print("Answer:")
     print(answer)
+    print("\n" + "="*60 + "\n")
 
     query_text = "What is Sachin's full name?"
     print(f"Query: {query_text}")
@@ -74,6 +75,7 @@ if __name__ == "__main__":
     answer = rag_chain(query_text)
     print("Answer:")
     print(answer)
+    print("\n" + "="*60 + "\n")
 
     query_text = "Tell me about history of Pune"
     print(f"Query: {query_text}")
@@ -81,6 +83,7 @@ if __name__ == "__main__":
     answer = rag_chain(query_text)
     print("Answer:")
     print(answer)
+    print("\n" + "="*60 + "\n")
 
     query_text = "If I go on heritage walk in Pune with Sachin, which places he would show me?"
     print(f"Query: {query_text}")
@@ -88,3 +91,4 @@ if __name__ == "__main__":
     answer = rag_chain(query_text)
     print("Answer:")
     print(answer)
+    print("\n" + "="*60 + "\n")
