@@ -43,7 +43,7 @@ def get_user_details(user_id):
 @tool
 def get_horoscope(sign):
     """
-    Get today's horoscope for an astrological sign.
+    Fetch today's horoscope for given astrological sign.
 
     Args:
         sign (str): The astrological sign.
@@ -113,7 +113,7 @@ def get_weather(country: str):
 userIdentityAgent = create_agent(
     tools=[get_user_details, get_membership], # Partitioning the tools for user identity agent
     model=model,
-    system_prompt="You are a helpful assistant that fetches user details and membership for given user ID. Always respond with the final action taken",
+    system_prompt="You are a helpful assistant that fetches user details and membership for given user ID. Always respond with the final action taken. Membership information is important make sure it is returned as part of final response",
     debug=False
 )
 #create the agent for fetching and updating horoscope
@@ -121,7 +121,12 @@ horoscopeAgent = create_agent(
     tools=[get_horoscope, update_horoscope_for_user], # Partitioning the tools for horoscope agent
     model=model,
     debug=False,
-    system_prompt="You are a helpful assistant that fetches horoscope for given astrological sign and updates horoscope fetched. Always update horoscope after fetching it. Always respond with the final action taken"
+    system_prompt="You are a helpful assistant who performs below steps in sequence when asked about updating horoscope : " \
+    "1. Fetche today's horoscope for given astrological sign" \
+    "2. Update the horoscope fetched earlier for user. " \
+    "RULES : " \
+    "ONLY update horoscope after fetching it. " \
+    "Always respond with the final action taken"
 )
 #create the agent for fetching weather information
 weatherAgent = create_agent(

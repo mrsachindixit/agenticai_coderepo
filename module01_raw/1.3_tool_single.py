@@ -42,7 +42,7 @@ def run_agent(user_message):
 
     print(f"— Asking about user query to assistant...")
     res = requests.post("http://localhost:11434/api/chat", json={
-        "model": "lfm2.5-thinking:latest",
+        "model": "llama3.1:latest",
         "messages": messages,
         "tools": tools,
         "stream": False
@@ -65,7 +65,7 @@ def run_agent(user_message):
         
         print("\n— Processing the response...")
         final_res = requests.post("http://localhost:11434/api/chat", json={
-            "model": "lfm2.5-thinking:latest",
+            "model": "llama3.1:latest",
             "messages": messages,
             "stream": False
         }).json()
