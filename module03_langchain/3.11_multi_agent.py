@@ -122,11 +122,10 @@ horoscopeAgent = create_agent(
     model=model,
     debug=False,
     system_prompt="You are a helpful assistant who performs below steps in sequence when asked about updating horoscope : " \
-    "1. Fetche today's horoscope for given astrological sign" \
-    "2. Update the horoscope fetched earlier for user. " \
+    "1. Fetche today's horoscope for given astrological sign using get_horoscope tool" \
+    "2. Update the horoscope fetched earlier for user using update_horoscope_for_user tool" \
     "RULES : " \
-    "ONLY update horoscope after fetching it. " \
-    "Always respond with the final action taken"
+    "ONLY update horoscope after fetching it. "
 )
 #create the agent for fetching weather information
 weatherAgent = create_agent(
@@ -160,8 +159,8 @@ def horoscope_tool(user_id, astrological_sign):
         str: The horoscope information for the given astrological sign.
     """
     print(f"— Subagent call triggered to fetch and update horoscope for user_id: {user_id} and astrological_sign: {astrological_sign}")
-    ai_msg = horoscopeAgent.invoke({"messages": [{"role": "user", "content": f"Fetch and update horoscope for user_id: {user_id} and astrological_sign: {astrological_sign}"}]})
-    print(f"— Subagent call result for horoscope for user_id: {user_id} and astrological_sign: {astrological_sign}: {ai_msg['messages'][-1].content}")
+    ai_msg = horoscopeAgent.invoke({"messages": [{"role": "user", "content": f"Get today's horoscope and update it for user_id: {user_id} and astrological_sign: {astrological_sign}"}]})
+    print(f"— Subagent call result for horoscope for user_id: {user_id} and astrological_sign: {astrological_sign}: {ai_msg['messages'][-1]}")
     return ai_msg['messages'][-1].content
 
 @tool
