@@ -2,7 +2,7 @@
 
 import base64
 from pathlib import Path
-from utils.ollama_client import chat
+import requests
 
 def analyze_image(image_path: str, question: str) -> str:
     """
@@ -26,10 +26,19 @@ def analyze_image(image_path: str, question: str) -> str:
         "content": question,
         "images": [image_b64]  # Pass raw base64 data
     }
-    
-    # Step 3: Call vision model via chat API
-    response = chat(messages=[message], model="llava:latest")
-    return response
+
+    url = "http://localhost:11434/api/chat"
+    payload = {
+        "model": "llava:latest",
+        "messages": [message],
+        "stream": False
+    }
+    print(f"Assistant analyzing the image...")
+    response = requests.post(url, json=payload)
+    result = response.json()
+    answer = result.get("message", {}).get("content", "")
+    print(f"Assistant : {answer}\n")
+    return answer
 
 
 # Example usage (minimal teaching scenario)
