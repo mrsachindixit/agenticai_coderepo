@@ -33,7 +33,7 @@ def demo_reversible_anonymizer():
         for fake, real in mapping.items():
             print(f"  {entity_type:20s}  {fake} → {real}")
 
-    llm = ChatOllama(model="llama3.2:latest", base_url="http://localhost:11434")
+    llm = ChatOllama(model="llama3.1:latest", base_url="http://localhost:11434")
     llm_response = llm.invoke([HumanMessage(content=f"Summarise this record:\n\n{anonymized_text}")])
     print(f"LLM response (fake names): {llm_response.content}")
 
@@ -57,7 +57,7 @@ def demo_pii_middleware():
         print("[SKIP] PIIMiddleware not available in this langchain version")
         return
 
-    llm = ChatOllama(model="llama3.2:latest", base_url="http://localhost:11434")
+    llm = ChatOllama(model="llama3.1:latest", base_url="http://localhost:11434")
     agent = create_agent(
         model=llm,
         tools=[],
