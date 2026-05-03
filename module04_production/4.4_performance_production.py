@@ -31,7 +31,7 @@ def setup_llm_cache():
 if __name__ == "__main__":
     setup_llm_cache()
 
-    llm = ChatOllama(model="llama3.2:latest", base_url="http://localhost:11434")
+    llm = ChatOllama(model="llama3.1:latest", base_url="http://localhost:11434")
 
     # First call — hits the model
     start = time.time()

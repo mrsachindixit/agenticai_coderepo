@@ -51,13 +51,13 @@ pip install -r requirements.txt
 
 Minimum models to start:
 ```bash
-ollama pull llama3.2
+ollama pull llama3.1
 ollama pull nomic-embed-text
 ```
 
 Additional models used across advanced samples:
 ```bash
-ollama pull llama3.2:latest
+ollama pull llama3.1:latest
 ollama pull lfm2.5-thinking:latest
 ollama pull llava
 ```
@@ -191,7 +191,7 @@ pytest evaluations/tests_samples -q
 | `Connection refused` | Run `ollama serve` |
 | `Model not found` | Run `ollama pull llama3.2` then `ollama list` |
 | Import errors | Run `pip install --upgrade -r requirements.txt` |
-| Missing advanced model | Pull additional models as needed: `llama3.2:latest`, `lfm2.5-thinking:latest`, `llava` |
+| Missing advanced model | Pull additional models as needed: `llama3.1:latest`, `lfm2.5-thinking:latest`, `llava` |
 
 ---
 
