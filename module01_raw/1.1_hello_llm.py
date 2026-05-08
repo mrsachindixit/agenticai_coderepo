@@ -47,3 +47,34 @@ response = requests.post(url, json=payload)
 print(f"Assistant: {response.json().get('response', '')}")
 
 
+# ---------------- LLM FLAGS  pls tweak them and read about them ----------------
+ .
+
+# Example 1: Add options in payload
+# payload_with_flags = {
+#     "model": "llama3.1:latest",
+#     "prompt": "Write one short motivational line.",
+#     "stream": False,
+#     "options": {
+#         "temperature": 0.7,
+#         "top_p": 0.9,
+#         "top_k": 40,
+#         "num_predict": 60,
+#         "repeat_penalty": 1.1,
+#         "seed": 42
+#     }
+# }
+# response = requests.post(url, json=payload_with_flags)
+# print(response.json().get("response", ""))
+
+# Example 2: Change one flag at a time
+# payload_top_p = {
+#     "model": "llama3.1:latest",
+#     "prompt": "Write one short motivational line.",
+#     "stream": False,
+#     "options": {"top_p": 0.6}
+# }
+# response = requests.post(url, json=payload_top_p)
+# print(response.json().get("response", ""))
+
+
