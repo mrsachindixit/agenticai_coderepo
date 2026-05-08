@@ -48,7 +48,7 @@ print(f"Assistant: {response.json().get('response', '')}")
 
 
 # ---------------- LLM FLAGS  pls tweak them and read about them ----------------
- .
+ 
 
 # Example 1: Add options in payload
 # payload_with_flags = {
