@@ -1,4 +1,53 @@
- 
+/*
+ * Embabel Goal-Directed Task Decomposition Agent (Java)
+ * ======================================================
+ *
+ * WHAT THIS SHOWS (capabilities unique to Embabel):
+ *   1. Goal-directed agents  — declare WHAT the agent should achieve, not HOW
+ *   2. @Action annotations   — Spring-managed steps with condition guards
+ *   3. Automatic planning    — Embabel picks the action sequence to reach a goal
+ *   4. Spring DI integration — services are injectable beans, fully testable
+ *   5. Domain-typed state    — immutable objects replace raw dicts
+ *
+ * WHY TASK DECOMPOSITION (not weather/pincode like earlier modules):
+ *   - module01–03 already demonstrate weather/pincode tool calls
+ *   - Task decomposition shows a PLANNING scenario where the order of
+ *     actions matters and guards are essential — Embabel's real strength
+ *   - The domain has clear preconditions: you can't estimate effort before
+ *     decomposing, and you can't validate before estimating — perfect for
+ *     Embabel's goal-directed execution model
+ *
+ * AGENT BEHAVIOUR:
+ *   Input: a vague task description ("Build a REST API for a blog")
+ *   Actions:
+ *     1. decompose  — LLM breaks task into subtasks (fires when subtasks empty)
+ *     2. estimate   — LLM assigns story points     (fires when subtasks set, effort unknown)
+ *     3. validate   — rule-based sanity check      (fires when effort set, not yet validated)
+ *     4. summarise  — LLM writes final plan        (fires when validated)
+ *   Goal: summary is populated
+ *
+ * COMPARE WITH:
+ *   - module01_raw/1.3_tool_single  : you write if/elif routing manually
+ *   - module03_langchain/3.2        : LangChain agent loop, still imperative
+ *   - 6.2_dspy_optimized_agent.py   : DSPy optimises prompts, you define pipeline
+ *   - This file                     : declare goal + actions, Embabel plans
+ *
+ * PREREQUISITES:
+ *   - JDK 21+, Maven or Gradle
+ *   - pom.xml dependency:
+ *       <dependency>
+ *           <groupId>com.embabel</groupId>
+ *           <artifactId>embabel-agent-api</artifactId>
+ *           <version>0.5.0</version>
+ *       </dependency>
+ *   - Ollama-compatible endpoint
+ *
+ * RUN: mvn spring-boot:run
+ *
+ * NOTE: Java/Spring file — cannot run in the Python venv.
+ *       Included as architectural comparison alongside the Python modules.
+ */
+
 package com.example.agenticai.embabel;
 
 import com.embabel.agent.api.annotation.Action;
