@@ -88,7 +88,7 @@ ONLY output one word: 'booker', 'info', or 'unclear'.""",
     graph.add_edge("unclear", END)
 
     return graph.compile()
-
+# START -> router -> {booker, info, unclear} -> END
 
 def main():
     try:

@@ -21,8 +21,8 @@ def agent_node(state: State) -> dict:
     result = agent.invoke({
         "messages": [{"role": "user", "content": query}]
     })
-    output = {"query": result["messages"][-1].content}
-    print(f"Agent returned answer: {output['query']}")
+    output = {"answer": result["messages"][-1].content}
+    print(f"Agent returned answer: {output['answer']}")
     return output
 
 # Build a simple workflow
@@ -33,6 +33,6 @@ workflow = (
     .add_edge("agent", END)
     .compile()
 )
-
+# START -> agent -> END
 result = workflow.invoke({"query": "What is the capital of France?"})
 print(f"Agent's answer: {result}")
