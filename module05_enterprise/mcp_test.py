@@ -2,7 +2,7 @@
 """
 Interactive Test Script for Tool Call Agent
 
-Run the MCP server first: python mcp_server.py
+Run the MCP server first: python 5.1_mcp_server.py
 Then run this script in another terminal to test all agent features.
 """
 
@@ -32,7 +32,7 @@ def invoke(resource: str, payload: Dict[str, Any], url: str = DEFAULT_URL) -> Di
     except requests.exceptions.ConnectionError:
         return {
             "error": "Cannot connect to server",
-            "message": "Make sure the MCP server is running: python mcp_server.py"
+            "message": "Make sure the MCP server is running: python 5.1_mcp_server.py"
         }
     except Exception as e:
         return {"error": str(e)}
@@ -267,8 +267,7 @@ def main():
             print("Next steps:")
             print("  1. Review the results above")
             print("  2. Try interactive mode: python mcp_test.py interactive")
-            print("  3. Read TOOL_CALL_AGENT_README.md for details")
-            print("  4. Modify mcp_server.py to add new tools\n")
+            print("  3. Modify 5.1_mcp_server.py to add new tools\n")
             
         except Exception as e:
             print(f"❌ Test failed: {e}")
