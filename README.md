@@ -184,16 +184,7 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 | `6.3_embabel_goal_agent.java` | Embabel (Java/Spring): `@Action` + `@Goal` — declarative planning, framework picks execution order |
 | `6.4_langchain_js_tool_call.mjs` | LangChain in JavaScript — same tool-call pattern as `3.1`, different runtime |
 
----
 
-### Capstones
-*Apply everything end-to-end. Attempt each one before reading the reference implementation.*
-
-| Capstone | What it combines |
-|---|---|
-| `capstone1_sql_agent/` | Schema discovery + safe SQL generation + result narration (Modules 01–03) |
-| `capstone2_research_agent/` | Planner/executor + PDF ingestion + RAG + auditable trail (Modules 01–04) |
-| `capstone3_rag_agent/` | Persistent vector index + conversational memory + grounded answers (Modules 01–03) |
 
 ---
 
