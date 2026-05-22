@@ -1,9 +1,10 @@
 
 """
-MCP Server exposing a Tool Call Agent.
+MCP Server exposing a Tool Call Agent (inline-first teaching version).
 
 This server demonstrates:
-- Tool Call Agent (SEE: agent.py for agent implementation)
+- Tool definitions inline in this file
+- Simple deterministic agent loop inline in this file
 - MCP Protocol patterns (request/response envelopes)
 - FastAPI integration with MCP
 - Multiple endpoint patterns (agent orchestration vs. direct tool calls)
@@ -15,14 +16,96 @@ from typing import Any, Dict
 import uvicorn
 import time
 import ast
-
-from agent import ToolCallAgent
+import re
 
 app = FastAPI(title="MCP Server with Tool Call Agent")
 
-# ==================== AGENT SETUP ====================
-# Import and initialize the agent (see agent.py for implementation)
-tool_call_agent = ToolCallAgent()
+
+# ==================== INLINE TOOLS ====================
+def get_weather(city: str) -> str:
+    temps = {"bogotá": "12°C", "new york": "18°C", "london": "8°C", "tokyo": "22°C"}
+    temp = temps.get(city.lower(), "15°C")
+    return f"{city}: {temp}, Partly cloudy"
+
+
+def get_pincode(city: str) -> str:
+    pincodes = {"bogotá": "110111", "new york": "10001", "london": "SW1A1AA", "tokyo": "100-0001"}
+    pincode = pincodes.get(city.lower(), "000000")
+    return f"{city}: {pincode}"
+
+
+def calculate(expression: str) -> str:
+    result, err = _safe_eval(expression)
+    return str(result) if err is None else f"Calculation error: {err}"
+
+
+TOOLS = {
+    "get_weather": get_weather,
+    "get_pincode": get_pincode,
+    "calculate": calculate,
+}
+
+TOOL_SCHEMAS = {
+    "get_weather": {
+        "name": "get_weather",
+        "description": "Get weather for a city",
+        "parameters": {"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]},
+    },
+    "get_pincode": {
+        "name": "get_pincode",
+        "description": "Get postal code for a city",
+        "parameters": {"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]},
+    },
+    "calculate": {
+        "name": "calculate",
+        "description": "Perform arithmetic calculation",
+        "parameters": {"type": "object", "properties": {"expression": {"type": "string"}}, "required": ["expression"]},
+    },
+}
+
+
+def run_agent_loop(user_query: str) -> Dict[str, Any]:
+    """Simple deterministic tool-routing agent loop (heuristic)."""
+    q = user_query.lower()
+    planned = []
+
+    if any(w in q for w in ["weather", "temperature", "climate", "hot", "cold"]):
+        for city in ["bogotá", "new york", "london", "tokyo"]:
+            if city in q:
+                planned.append(("get_weather", {"city": city}))
+                break
+
+    if any(w in q for w in ["pincode", "postal", "zip", "code"]):
+        for city in ["bogotá", "new york", "london", "tokyo"]:
+            if city in q:
+                planned.append(("get_pincode", {"city": city}))
+                break
+
+    if any(w in q for w in ["calculate", "math", "compute", "plus", "minus"]):
+        match = re.search(r"(\d+\s*[\+\-\*/]\s*\d+)", q)
+        if match:
+            planned.append(("calculate", {"expression": match.group(1)}))
+
+    if not planned:
+        return {
+            "query": user_query,
+            "iterations": [],
+            "final_answer": "I can help with weather, pincode, or calculation queries. Try asking: 'What's the weather in Bogotá?' or 'What is the pincode for London?'",
+            "tools_available": list(TOOL_SCHEMAS.keys()),
+        }
+
+    iterations = []
+    parts = ["Based on the tools called:"]
+    for idx, (name, args) in enumerate(planned, start=1):
+        result = TOOLS[name](**args)
+        iterations.append({"step": idx, "action": f"Called {name}", "result": result})
+        parts.append(f"- {name}: {result}")
+
+    return {
+        "query": user_query,
+        "iterations": iterations,
+        "final_answer": "\n".join(parts),
+    }
 
 
 class Envelope(BaseModel):
@@ -73,7 +156,7 @@ async def invoke(envelope: Envelope):
         if not user_query:
             body = {"status": "error", "error": "Missing 'query' parameter"}
         else:
-            agent_result = tool_call_agent.run_agent_loop(user_query)
+            agent_result = run_agent_loop(user_query)
             body = {"status": "ok", "result": agent_result}
     
     elif resource == "agent/tools":
@@ -84,7 +167,7 @@ async def invoke(envelope: Envelope):
                 "description": schema["description"],
                 "parameters": schema.get("parameters", {})
             }
-            for schema in tool_call_agent.tool_schemas.values()
+            for schema in TOOL_SCHEMAS.values()
         ]
         body = {"status": "ok", "result": tools_list}
     
@@ -94,7 +177,7 @@ async def invoke(envelope: Envelope):
         if not city:
             body = {"status": "error", "error": "Missing 'city' parameter"}
         else:
-            result = tool_call_agent.invoke_tool("get_weather", {"city": city})
+            result = get_weather(city)
             body = {"status": "ok", "result": result}
     
     elif resource == "tool/pincode":
@@ -103,7 +186,7 @@ async def invoke(envelope: Envelope):
         if not city:
             body = {"status": "error", "error": "Missing 'city' parameter"}
         else:
-            result = tool_call_agent.invoke_tool("get_pincode", {"city": city})
+            result = get_pincode(city)
             body = {"status": "ok", "result": result}
     
     elif resource == "tool/calculate":
@@ -112,7 +195,7 @@ async def invoke(envelope: Envelope):
         if not expression:
             body = {"status": "error", "error": "Missing 'expression' parameter"}
         else:
-            result = tool_call_agent.invoke_tool("calculate", {"expression": expression})
+            result = calculate(expression)
             body = {"status": "ok", "result": result}
     
     else:

@@ -1,12 +1,7 @@
-﻿
-
-import os
+﻿import os
 import ast
 import dspy
 
-# ---------------------------------------------------------------------------
-# 1. Configure DSPy to use local Ollama
-# ---------------------------------------------------------------------------
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 
@@ -18,12 +13,8 @@ lm = dspy.LM(
 )
 dspy.configure(lm=lm)
 
-# ---------------------------------------------------------------------------
-# 2. Tools — two tools with different purposes to make selection interesting
-# ---------------------------------------------------------------------------
-
 def calculate(expression: str) -> str:
-    """Safely evaluate an arithmetic expression and return the numeric result."""
+    """Evaluate arithmetic safely."""
     try:
         node = ast.parse(expression, mode="eval")
         for n in ast.walk(node):
@@ -36,7 +27,7 @@ def calculate(expression: str) -> str:
 
 
 def explain_steps(expression: str) -> str:
-    """Return a plain-English breakdown of how to solve the expression."""
+    """Return a simple step-by-step explanation."""
     steps = [
         f"Expression: {expression}",
         "Step 1: Identify operations following PEMDAS/BODMAS order",
@@ -54,16 +45,8 @@ TOOL_REGISTRY = {
     "explain_steps": explain_steps,
 }
 
-# ---------------------------------------------------------------------------
-# 3. DSPy Signatures — declarative contracts (no manual prompt engineering)
-#
-#    CONTRAST with module01: there you write the prompt string yourself.
-#    Here you declare the input/output fields and DSPy generates prompts.
-# ---------------------------------------------------------------------------
-
 class DecideTool(dspy.Signature):
-    """Given a math question, decide which tool to use and what expression to pass.
-    Use 'calculate' for direct answers. Use 'explain_steps' when steps are requested."""
+    """Pick tool and expression from a math question."""
 
     question: str = dspy.InputField(desc="user's math question")
     tool_name: str = dspy.OutputField(desc="either 'calculate' or 'explain_steps'")
@@ -71,28 +54,15 @@ class DecideTool(dspy.Signature):
 
 
 class Summarize(dspy.Signature):
-    """Given a math question and a tool result, produce a clear final answer."""
+    """Produce a final answer from tool output."""
 
     question: str = dspy.InputField()
     tool_result: str = dspy.InputField(desc="raw output from the tool")
     answer: str = dspy.OutputField(desc="final natural-language answer for the user")
 
 
-# ---------------------------------------------------------------------------
-# 4. DSPy Module — composable agent pipeline
-#
-#    Same 3-step pattern as module01's run_agent(), but:
-#    - No hand-written if/elif routing
-#    - Prompts are auto-generated and optimizable
-# ---------------------------------------------------------------------------
-
 class CalculatorAgent(dspy.Module):
-    """
-    Three-step pipeline:
-      Step 1 — LLM selects tool + extracts expression  (DecideTool)
-      Step 2 — Execute the chosen tool (deterministic)
-      Step 3 — LLM summarizes result for the user      (Summarize)
-    """
+    """Tool-selection + execution + summary pipeline."""
 
     def __init__(self):
         super().__init__()
@@ -100,18 +70,15 @@ class CalculatorAgent(dspy.Module):
         self.summarize = dspy.ChainOfThought(Summarize)
 
     def forward(self, question: str):
-        # Step 1: LLM decides which tool and what argument
         decision = self.decide(question=question)
         tool_name = decision.tool_name.strip().lower()
         tool_arg = decision.tool_arg.strip()
 
-        # Step 2: Execute the tool (no LLM, deterministic)
         tool_fn = TOOL_REGISTRY.get(tool_name)
         if tool_fn is None:
             return dspy.Prediction(answer=f"Unknown tool '{tool_name}'. Choose calculate or explain_steps.")
         tool_result = tool_fn(tool_arg)
 
-        # Step 3: LLM composes a readable answer
         summary = self.summarize(question=question, tool_result=tool_result)
         return dspy.Prediction(
             tool_name=tool_name,
@@ -119,14 +86,6 @@ class CalculatorAgent(dspy.Module):
             tool_result=tool_result,
             answer=summary.answer,
         )
-
-
-# ---------------------------------------------------------------------------
-# 5. DSPy Optimization — THE superpower: auto-tune prompts with few-shot data
-#
-#    BootstrapFewShot picks examples from the training set and injects them
-#    into the prompt automatically — no manual prompt engineering.
-# ---------------------------------------------------------------------------
 
 TRAIN_EXAMPLES = [
     dspy.Example(
@@ -165,7 +124,7 @@ def tool_selection_metric(example, prediction, trace=None) -> float:
 
 
 def optimize_agent() -> CalculatorAgent:
-    """Auto-optimize prompts using BootstrapFewShot."""
+    """Optimize prompts using BootstrapFewShot."""
     agent = CalculatorAgent()
     optimizer = dspy.BootstrapFewShot(
         metric=tool_selection_metric,
@@ -175,11 +134,6 @@ def optimize_agent() -> CalculatorAgent:
     optimized = optimizer.compile(agent, trainset=TRAIN_EXAMPLES)
     print("Optimization complete — prompts auto-tuned with few-shot examples.\n")
     return optimized
-
-
-# ---------------------------------------------------------------------------
-# 6. Main — baseline vs optimized, side-by-side
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     print("=== DSPy Calculator Agent ===")

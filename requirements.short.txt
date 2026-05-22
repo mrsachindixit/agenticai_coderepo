@@ -12,6 +12,7 @@ langgraph
 streamlit
 fastapi
 uvicorn
+fastmcp
 
 # Data & numerics
 numpy
