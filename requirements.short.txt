@@ -13,6 +13,7 @@ streamlit
 fastapi
 uvicorn
 fastmcp
+mcp[cli]
 
 # Data & numerics
 numpy

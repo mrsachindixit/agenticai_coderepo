@@ -83,19 +83,117 @@ python capstones/capstone1_sql_agent/cap1_app.py "List engineering employees wit
 
 ## 🗺️ Learning Path
 
-Follow the modules in order — each one builds on the previous:
+Follow the modules in order — each one builds on the previous. The arc moves from a single raw LLM call all the way to enterprise-grade protocols and alternative frameworks.
 
-| Module | Topic |
+---
+
+### Module 01 · Raw LLM Interactions
+*Start here. No frameworks — just Python + Ollama. You learn what an LLM actually does at the API level.*
+
+| File | What it teaches |
 |---|---|
-| `module01_raw/` | LLM basics, tool calling, RAG intro, memory |
-| `module02_basics/` | Chat objects, multi-modal, image analysis |
-| `module03_langchain/` | LangChain agents, memory, LangGraph, middleware |
-| `module04_production/` | Security, performance, monitoring, PII/bias |
-| `module05_enterprise/` | MCP, A2A protocols, enterprise patterns |
-| `module06_frameworks/` | LlamaIndex, DSPy, Embabel, cross-language comparison samples |
-| `capstones/` | End-to-end projects combining all concepts |
-| `playground/` | Interactive Streamlit app |
-| `evaluations/` | Test suites and sanity checks |
+| `1.1_hello_llm.py` | Your first LLM call — send a prompt, read a response |
+| `1.2_chat_io.py` | Interactive chat loop with streaming and turn history |
+| `1.3_tool_single.py` | Give the LLM one tool and let it decide when to use it |
+| `1.4_memory_sim.py` | Simulate short-term memory by managing the message list yourself |
+| `1.5_code_gen.py` | Prompt the LLM to write Python, then execute the output safely |
+| `1.6_regex_bot.py` | Deterministic response routing via regex — no LLM for intent |
+| `1.7_nlp_bot.py` | Lightweight NLP intent detection as a fallback before the LLM |
+| `1.8_tools_multi.py` | Multiple tools in one agent loop — LLM picks which to call |
+| `1.9_db_agent_sqlite.py` | Full agent that translates natural language to SQL and executes it |
+| `1.10_rag_basic/` | Retrieval-Augmented Generation from scratch: embed, store, retrieve, answer |
+
+---
+
+### Module 02 · LangChain Primitives
+*Introduce LangChain's chat model objects. Same concepts as Module 01 but now using the framework's building blocks — notice how the pattern maps 1:1.*
+
+| File | What it teaches |
+|---|---|
+| `2.1_chat_obj_llm.py` | `ChatOllama` object replaces raw `requests` — same call, cleaner interface |
+| `2.2_image_analysis.py` | Multi-modal input: pass an image to a vision-capable LLM |
+| `2.3_chat_obj_tool_single.py` | `model.bind_tools([...])` — single tool, same loop as `1.3` but framework-native |
+| `2.4_chat_obj_tool_multi.py` | Multiple tools bound to the model; LangChain handles the dispatch loop |
+
+---
+
+### Module 03 · LangChain Agents & LangGraph
+*The framework takes over orchestration. You declare agents, graphs, and memory — the framework runs the loop.*
+
+| File | What it teaches |
+|---|---|
+| `3.1_tool_call.py` | LangChain `@tool` decorator and `.invoke()` — the declarative equivalent of `1.3` |
+| `3.2_agent_simple.py` | `create_react_agent` — hand the LLM a toolset and let the ReAct loop run |
+| `3.3_memory_checkpoint_langchain.py` | Persist conversation state with `MemorySaver` checkpoints |
+| `3.4_multi_agent.py` | Two agents collaborating: one plans, one executes |
+| `3.5_lg_basic.py` | First LangGraph: nodes, edges, and `StateGraph` — graphs replace imperative loops |
+| `3.6_agent_middleware_langchain.py` | Intercept agent steps with middleware: logging, auth, rate-limit |
+| `3.7_multi_tool_call.py` | LLM makes multiple tool calls in a single turn |
+| `3.8_agent_multi_tool.py` | Agent with a full tool registry; LangChain resolves calls automatically |
+| `3.9_agent_tools_seq_basic.py` | Force sequential tool execution — output of one feeds into the next |
+| `3.10_memory_checkpoint_langchain_1.py` | Persistent memory across sessions using thread IDs |
+| `3.11_multi_agent.py` | Supervisor pattern: one agent routes tasks to specialist sub-agents |
+| `3.12_rag_langchain.py` | Full RAG pipeline using LangChain retriever + chat chain |
+| `3.13_agent_tools_with_tool_seq.py` | Tools that themselves trigger further tool calls (tool chaining) |
+| `3.14_multi_tool_orchestration.py` | Parallel and conditional tool fan-out in a single agent run |
+| `3.15_langgraph_coordinator.py` | LangGraph coordinator node that routes to worker subgraphs |
+| `3.16_lg_pause_resume_hitl.py` | Human-in-the-loop: graph pauses mid-run and waits for human approval |
+
+---
+
+### Module 04 · Production Concerns
+*Your agent works in a notebook — now make it safe, observable, and resilient. Each file adds one production dimension.*
+
+| File | What it teaches |
+|---|---|
+| `4.1_security_basic.py` | Input validation and prompt injection defence without a library |
+| `4.2_security_guardrails_ai.py` | Drop-in guardrails using the `guardrails-ai` framework |
+| `4.3_performance_basic.py` | Response caching and timeout handling to reduce latency |
+| `4.4_performance_production.py` | Retry logic with exponential back-off using `tenacity` |
+| `4.5_monitoring_basic.py` | Structured logging of every LLM call: latency, tokens, outcome |
+| `4.6_monitoring_opentelemetry.py` | OpenTelemetry traces and spans — agent calls become distributed traces |
+| `4.7_pii_basic.py` | Detect and redact PII with regex before data reaches the LLM |
+| `4.8_pii_presidio.py` | Production PII detection with Microsoft Presidio NER |
+| `4.9_pii_langchain.py` | Presidio wired into a LangChain chain as a preprocessing step |
+| `4.10_bias_guardrails.py` | Detect biased or harmful outputs and block or flag the response |
+
+---
+
+### Module 05 · Enterprise Protocols
+*Agents talking to agents over standard protocols — MCP for tool exposure, A2A for agent-to-agent messaging.*
+
+| File | What it teaches |
+|---|---|
+| `5.1_mcp_server.py` | Build an MCP server from scratch using FastAPI — understand the envelope protocol |
+| `5.2_mcp_client.py` | HTTP client that calls the `5.1` server's tools and reads its resources |
+| `5.3_mcp_sdk_server.py` | Same server rebuilt with the official `mcp` SDK: `@mcp.tool`, `@mcp.resource`, `@mcp.prompt`, and a real LLM call via `Context` |
+| `5.4_mcp_sdk_client.py` | Async `ClientSession` that invokes tools, reads resources, and fetches prompts from `5.3` |
+| `5.5_a2a_demo.py` | Agent-to-Agent in one file: two Ollama-backed agents passing messages to each other |
+| `5.6_a2a_server.py` | A2A server — registers agents, routes messages, maintains inboxes |
+| `5.7_a2a_client.py` | A2A client — registers, sends messages, polls inbox |
+
+---
+
+### Module 06 · Alternative Frameworks
+*Same agent problems solved by different tools — compare the trade-offs, pick the right tool for the job.*
+
+| File | What it teaches |
+|---|---|
+| `6.1_llamaindex_rag.py` | LlamaIndex RAG with Ollama embeddings — compare with `1.10` and `3.12` |
+| `6.2_dspy_optimized_agent.py` | DSPy: declare signatures and let `BootstrapFewShot` optimise prompts automatically |
+| `6.3_embabel_goal_agent.java` | Embabel (Java/Spring): `@Action` + `@Goal` — declarative planning, framework picks execution order |
+| `6.4_langchain_js_tool_call.mjs` | LangChain in JavaScript — same tool-call pattern as `3.1`, different runtime |
+
+---
+
+### Capstones
+*Apply everything end-to-end. Attempt each one before reading the reference implementation.*
+
+| Capstone | What it combines |
+|---|---|
+| `capstone1_sql_agent/` | Schema discovery + safe SQL generation + result narration (Modules 01–03) |
+| `capstone2_research_agent/` | Planner/executor + PDF ingestion + RAG + auditable trail (Modules 01–04) |
+| `capstone3_rag_agent/` | Persistent vector index + conversational memory + grounded answers (Modules 01–03) |
 
 ---
 
