@@ -1,6 +1,4 @@
-﻿"""LlamaIndex RAG demo."""
-
-import os
+﻿import os
 
 from llama_index.core import (
     Settings,
@@ -24,27 +22,25 @@ DATA_DIR = os.path.join(
 )
 
 def build_index():
-    """Load docs, chunk, embed, and return a queryable vector index."""
     documents = SimpleDirectoryReader(
         input_dir=DATA_DIR,
         required_exts=[".txt"],
         recursive=False,
     ).load_data()
-    print(f"Loaded {len(documents)} document chunks from {DATA_DIR}")
+    print(f"Loaded {len(documents)} chunks")
     index = VectorStoreIndex.from_documents(documents, show_progress=True)
     return index
 
 def query_index(index, question: str) -> str:
-    """Ask a question and return grounded answer."""
     query_engine = index.as_query_engine(similarity_top_k=3)
     response = query_engine.query(question)
 
-    print("\n--- Source nodes (provenance) ---")
+    print("\nSources:")
     for node in response.source_nodes:
         score = f"{node.score:.3f}" if node.score else "n/a"
         snippet = node.text[:120].replace("\n", " ")
         print(f"  [{score}] {snippet}...")
-    print("--- end sources ---\n")
+    print()
 
     return str(response)
 

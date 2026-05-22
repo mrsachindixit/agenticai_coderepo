@@ -14,7 +14,6 @@ lm = dspy.LM(
 dspy.configure(lm=lm)
 
 def calculate(expression: str) -> str:
-    """Evaluate arithmetic safely."""
     try:
         node = ast.parse(expression, mode="eval")
         for n in ast.walk(node):
@@ -27,7 +26,6 @@ def calculate(expression: str) -> str:
 
 
 def explain_steps(expression: str) -> str:
-    """Return a simple step-by-step explanation."""
     steps = [
         f"Expression: {expression}",
         "Step 1: Identify operations following PEMDAS/BODMAS order",
@@ -46,24 +44,18 @@ TOOL_REGISTRY = {
 }
 
 class DecideTool(dspy.Signature):
-    """Pick tool and expression from a math question."""
-
     question: str = dspy.InputField(desc="user's math question")
     tool_name: str = dspy.OutputField(desc="either 'calculate' or 'explain_steps'")
     tool_arg: str = dspy.OutputField(desc="the arithmetic expression to evaluate, e.g. '2+3*4'")
 
 
 class Summarize(dspy.Signature):
-    """Produce a final answer from tool output."""
-
     question: str = dspy.InputField()
     tool_result: str = dspy.InputField(desc="raw output from the tool")
     answer: str = dspy.OutputField(desc="final natural-language answer for the user")
 
 
 class CalculatorAgent(dspy.Module):
-    """Tool-selection + execution + summary pipeline."""
-
     def __init__(self):
         super().__init__()
         self.decide = dspy.ChainOfThought(DecideTool)
@@ -117,14 +109,12 @@ TRAIN_EXAMPLES = [
 
 
 def tool_selection_metric(example, prediction, trace=None) -> float:
-    """Metric: did the LLM pick the right tool AND extract the right expression?"""
     name_ok = prediction.tool_name.strip().lower() == example.tool_name.strip().lower()
     arg_ok  = prediction.tool_arg.strip() == example.tool_arg.strip()
     return float(name_ok and arg_ok)
 
 
 def optimize_agent() -> CalculatorAgent:
-    """Optimize prompts using BootstrapFewShot."""
     agent = CalculatorAgent()
     optimizer = dspy.BootstrapFewShot(
         metric=tool_selection_metric,
@@ -132,21 +122,19 @@ def optimize_agent() -> CalculatorAgent:
         max_labeled_demos=4,
     )
     optimized = optimizer.compile(agent, trainset=TRAIN_EXAMPLES)
-    print("Optimization complete — prompts auto-tuned with few-shot examples.\n")
+    print("Optimization complete\n")
     return optimized
 
 if __name__ == "__main__":
-    print("=== DSPy Calculator Agent ===")
-    print("Demonstrates: declarative signatures + automatic prompt optimization")
-    print("Compare with: module01_raw/1.3_tool_single (same pattern, hand-written)\n")
+    print("=== DSPy Calculator ===")
+    print()
 
     test_questions = [
         "What is 12 * 8 + 5?",
         "Explain step by step how to evaluate (2 + 3) * 4",
     ]
 
-    # --- Baseline (zero optimization) ---
-    print("--- Baseline (no optimization) ---")
+    print("--- Baseline ---")
     baseline = CalculatorAgent()
     for q in test_questions:
         r = baseline(question=q)
@@ -154,8 +142,7 @@ if __name__ == "__main__":
         print(f"     Tool: {r.tool_name}({r.tool_arg})  →  {r.tool_result}")
         print(f"     Answer: {r.answer}\n")
 
-    # --- Optimized (auto-tuned prompts via BootstrapFewShot) ---
-    print("--- Optimized (BootstrapFewShot auto-tunes prompts) ---")
+    print("--- Optimized ---")
     try:
         optimized = optimize_agent()
         for q in test_questions:
@@ -165,9 +152,4 @@ if __name__ == "__main__":
             print(f"     Answer: {r.answer}\n")
     except Exception as exc:
         print(f"  Optimization skipped: {exc}")
-        print("  The baseline above still demonstrates the pattern.\n")
-
-    print("KEY TAKEAWAY:")
-    print("  module01 — you write the prompt, you write the if/elif routing")
-    print("  DSPy     — you declare signatures, optimization writes prompts for you")
-    print("  Same agent pattern, radically different development experience.")
+        print()
