@@ -1,13 +1,9 @@
 
 """
-MCP Server exposing a Tool Call Agent (inline-first teaching version).
+Pls see mcp sdk file for study , this file is for
+acacdmic completness ,shows innerworkings of mcp without
+the annotations .
 
-This server demonstrates:
-- Tool definitions inline in this file
-- Simple deterministic agent loop inline in this file
-- MCP Protocol patterns (request/response envelopes)
-- FastAPI integration with MCP
-- Multiple endpoint patterns (agent orchestration vs. direct tool calls)
 """
 
 from fastapi import FastAPI
@@ -15,13 +11,13 @@ from pydantic import BaseModel
 from typing import Any, Dict
 import uvicorn
 import time
-import ast
-import re
 
 app = FastAPI(title="MCP Server with Tool Call Agent")
 
 
-# ==================== INLINE TOOLS ====================
+# ==================== CORE MCP TEACHING CODE ====================
+
+
 def get_weather(city: str) -> str:
     temps = {"bogotá": "12°C", "new york": "18°C", "london": "8°C", "tokyo": "22°C"}
     temp = temps.get(city.lower(), "15°C")
@@ -34,15 +30,9 @@ def get_pincode(city: str) -> str:
     return f"{city}: {pincode}"
 
 
-def calculate(expression: str) -> str:
-    result, err = _safe_eval(expression)
-    return str(result) if err is None else f"Calculation error: {err}"
-
-
 TOOLS = {
     "get_weather": get_weather,
     "get_pincode": get_pincode,
-    "calculate": calculate,
 }
 
 TOOL_SCHEMAS = {
@@ -56,56 +46,44 @@ TOOL_SCHEMAS = {
         "description": "Get postal code for a city",
         "parameters": {"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]},
     },
-    "calculate": {
-        "name": "calculate",
-        "description": "Perform arithmetic calculation",
-        "parameters": {"type": "object", "properties": {"expression": {"type": "string"}}, "required": ["expression"]},
+}
+
+PROMPT_SCHEMAS = {
+    "city_weather_prompt": {
+        "name": "city_weather_prompt",
+        "description": "Prompt template to ask weather by city",
+        "template": "What is the weather in {city}?",
+        "input_variables": ["city"],
+    },
+    "city_pincode_prompt": {
+        "name": "city_pincode_prompt",
+        "description": "Prompt template to ask pincode by city",
+        "template": "What is the pincode for {city}?",
+        "input_variables": ["city"],
     },
 }
 
+RESOURCE_CATALOG = [
+    "agent/tools",
+    "agent/prompts",
+    "tool/weather",
+    "tool/pincode",
+]
 
-def run_agent_loop(user_query: str) -> Dict[str, Any]:
-    """Simple deterministic tool-routing agent loop (heuristic)."""
-    q = user_query.lower()
-    planned = []
 
-    if any(w in q for w in ["weather", "temperature", "climate", "hot", "cold"]):
-        for city in ["bogotá", "new york", "london", "tokyo"]:
-            if city in q:
-                planned.append(("get_weather", {"city": city}))
-                break
-
-    if any(w in q for w in ["pincode", "postal", "zip", "code"]):
-        for city in ["bogotá", "new york", "london", "tokyo"]:
-            if city in q:
-                planned.append(("get_pincode", {"city": city}))
-                break
-
-    if any(w in q for w in ["calculate", "math", "compute", "plus", "minus"]):
-        match = re.search(r"(\d+\s*[\+\-\*/]\s*\d+)", q)
-        if match:
-            planned.append(("calculate", {"expression": match.group(1)}))
-
-    if not planned:
-        return {
-            "query": user_query,
-            "iterations": [],
-            "final_answer": "I can help with weather, pincode, or calculation queries. Try asking: 'What's the weather in Bogotá?' or 'What is the pincode for London?'",
-            "tools_available": list(TOOL_SCHEMAS.keys()),
+def list_tools() -> list[Dict[str, Any]]:
+    return [
+        {
+            "name": schema["name"],
+            "description": schema["description"],
+            "parameters": schema.get("parameters", {}),
         }
+        for schema in TOOL_SCHEMAS.values()
+    ]
 
-    iterations = []
-    parts = ["Based on the tools called:"]
-    for idx, (name, args) in enumerate(planned, start=1):
-        result = TOOLS[name](**args)
-        iterations.append({"step": idx, "action": f"Called {name}", "result": result})
-        parts.append(f"- {name}: {result}")
 
-    return {
-        "query": user_query,
-        "iterations": iterations,
-        "final_answer": "\n".join(parts),
-    }
+def list_prompts() -> list[Dict[str, Any]]:
+    return list(PROMPT_SCHEMAS.values())
 
 
 class Envelope(BaseModel):
@@ -118,14 +96,11 @@ class Envelope(BaseModel):
 
 @app.post("/mcp/invoke")
 async def invoke(envelope: Envelope):
-    """MCP invoke endpoint with tool call agent support.
+    """MCP invoke endpoint.
 
     Resources:
-    - "compute": Simple arithmetic evaluation
-    - "search": Sample search results
-    - "summarize": Text summarization
-    - "agent/invoke": Tool call agent
     - "agent/tools": List available tools
+    - "agent/prompts": List demo prompt templates
     - "tool/weather": Get weather for a city
     - "tool/pincode": Get pincode for a city
     """
@@ -133,101 +108,49 @@ async def invoke(envelope: Envelope):
     resource = envelope.resource
     payload = envelope.payload or {}
 
-    # Dispatch to handlers
-    if resource == "compute":
-        expr = payload.get("expression", "")
-        result, err = _safe_eval(expr)
-        status = "ok" if err is None else "error"
-        body = {"status": status, "result": result, "error": err}
-    
-    elif resource == "search":
-        q = payload.get("q", "")
-        results = [{"title": f"Result for {q} #{i}", "url": f"https://example.org/{i}", "snippet": "Summary..."} for i in range(1, 4)]
-        body = {"status": "ok", "result": results}
-    
-    elif resource == "summarize":
-        text = payload.get("text", "")
-        body = {"status": "ok", "result": text[:200]}
-    
-    # ========== TOOL CALL AGENT RESOURCES ==========
-    elif resource == "agent/invoke":
-        """Invoke the tool call agent"""
-        user_query = payload.get("query", "")
-        if not user_query:
-            body = {"status": "error", "error": "Missing 'query' parameter"}
-        else:
-            agent_result = run_agent_loop(user_query)
-            body = {"status": "ok", "result": agent_result}
-    
-    elif resource == "agent/tools":
-        """List available tools in the agent"""
-        tools_list = [
-            {
-                "name": schema["name"],
-                "description": schema["description"],
-                "parameters": schema.get("parameters", {})
-            }
-            for schema in TOOL_SCHEMAS.values()
-        ]
-        body = {"status": "ok", "result": tools_list}
-    
+    if resource == "agent/tools":
+        body = {"status": "ok", "result": list_tools()}
+
+    elif resource == "agent/prompts":
+        body = {"status": "ok", "result": list_prompts()}
+
     elif resource == "tool/weather":
-        """Direct tool call: get weather"""
         city = payload.get("city", "")
-        if not city:
-            body = {"status": "error", "error": "Missing 'city' parameter"}
-        else:
-            result = get_weather(city)
-            body = {"status": "ok", "result": result}
-    
+        body = {"status": "ok", "result": get_weather(city)} if city else {"status": "error", "error": "Missing 'city' parameter"}
+
     elif resource == "tool/pincode":
-        """Direct tool call: get pincode"""
         city = payload.get("city", "")
-        if not city:
-            body = {"status": "error", "error": "Missing 'city' parameter"}
-        else:
-            result = get_pincode(city)
-            body = {"status": "ok", "result": result}
-    
-    elif resource == "tool/calculate":
-        """Direct tool call: calculate expression"""
-        expression = payload.get("expression", "")
-        if not expression:
-            body = {"status": "error", "error": "Missing 'expression' parameter"}
-        else:
-            result = calculate(expression)
-            body = {"status": "ok", "result": result}
-    
+        body = {"status": "ok", "result": get_pincode(city)} if city else {"status": "error", "error": "Missing 'city' parameter"}
+
     else:
         body = {"status": "error", "error": f"unknown resource: {resource}"}
 
     elapsed = time.time() - start
-    resp = {
+    return {
         "id": envelope.id,
         "type": "response",
         "resource": envelope.resource,
         "metadata": {"elapsed": elapsed},
         "payload": body,
     }
-    return resp
 
 
-def _safe_eval(expr: str):
-    """Evaluate a simple arithmetic expression safely using ast.
-
-    Only allows numeric literals and +,-,*,/,(),**,%.
-    """
-    try:
-        node = ast.parse(expr, mode="eval")
-        for n in ast.walk(node):
-            if isinstance(n, ast.Call):
-                return None, "calls not allowed"
-            if isinstance(n, ast.Name):
-                return None, "names not allowed"
-        code = compile(node, '<string>', 'eval')
-        return eval(code, {__builtins__: {}}, {}), None
-    except Exception as e:
-        return None, str(e)
+# ==================== OPTIONAL METADATA ENDPOINT ====================
+@app.get("/mcp/catalog")
+async def mcp_catalog():
+    """Teaching-friendly metadata endpoint for tools/prompts/resources."""
+    return {
+        "server": {
+            "name": "MCP Server with Tool Call Agent",
+            "version": "1.2.0",
+            "teaching_demo": True,
+            "annotations_note": "Decorator-based annotations are in 5.3_mcp_sdk_server.py",
+            "disclaimer": "This web inspector is for classroom/demo use. Production integrations usually rely on MCP clients/SDK transports.",
+        },
+        "resources": RESOURCE_CATALOG,
+        "tools": list_tools(),
+        "prompts": list_prompts(),
+    }
 
 
 if __name__ == "__main__":

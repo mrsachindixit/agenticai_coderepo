@@ -1,9 +1,10 @@
 import asyncio
+import os
 
 from mcp import ClientSession, types
 from mcp.client.streamable_http import streamable_http_client
 
-SERVER = "http://localhost:8000/mcp"
+SERVER = os.getenv("MCP_SERVER_URL", "http://localhost:8000/mcp")
 
 
 async def main():
@@ -17,11 +18,8 @@ async def main():
             result = await session.call_tool("get_weather", {"city": "London"})
             print("Weather:", result.content[0].text if result.content else result.structuredContent)
 
-            result = await session.call_tool("calculate", {"expression": "12 * 8 + 5"})
-            print("Math:", result.content[0].text if result.content else result.structuredContent)
-
-            result = await session.call_tool("describe_city", {"city": "Tokyo"})
-            print("City:", result.content[0].text if result.content else result.structuredContent)
+            result = await session.call_tool("get_pincode", {"city": "Tokyo"})
+            print("Pincode:", result.content[0].text if result.content else result.structuredContent)
 
             resources = await session.list_resources()
             print("Resources:", [str(r.uri) for r in resources.resources])
@@ -38,6 +36,9 @@ async def main():
             print("Prompts:", [p.name for p in prompts.prompts])
 
             prompt = await session.get_prompt("weather_prompt", {"city": "Tokyo"})
+            print("Prompt text:", prompt.messages[0].content.text)
+
+            prompt = await session.get_prompt("pincode_prompt", {"city": "London"})
             print("Prompt text:", prompt.messages[0].content.text)
 
 
