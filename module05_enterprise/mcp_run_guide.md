@@ -9,8 +9,10 @@ cd agenticai_coderepo
 ## 1) Run MCP server (5.3)
 
 ```powershell
-uv run python module05_enterprise/5.3_mcp_sdk_server.py
+uv run --with "mcp[cli]" python module05_enterprise/5.3_mcp_sdk_server.py
 ```
+
+If you see `ModuleNotFoundError: No module named 'mcp'`, use the same command above (it bootstraps `mcp` automatically).
 
 Server endpoint:
 - `http://localhost:8000/mcp`
@@ -21,11 +23,25 @@ Server endpoint:
 npx @modelcontextprotocol/inspector
 ```
 
+This command starts the Inspector app (it prints a local URL to open in browser).
+
 ## 3) Connect Inspector to server
 
-- Transport: **Streamable HTTP**
-- URL: `http://localhost:8000/mcp`
-- Click initialize, then inspect tools/resources/prompts.
+Use this exact sequence:
+
+1. Keep Terminal A running `5.3`.
+2. In Terminal B run `npx @modelcontextprotocol/inspector`.
+3. Open the Inspector URL shown in Terminal B.
+4. In Inspector choose transport `http` (Streamable HTTP).
+5. Set server URL to `http://localhost:8000/mcp`.
+6. Click **Initialize**.
+7. Open Tools / Resources / Prompts tabs and invoke calls.
+
+Optional (prefilled connect from CLI):
+
+```powershell
+npx @modelcontextprotocol/inspector --transport http --server-url http://localhost:8000/mcp
+```
 
 Note: Inspector runs as a separate process and connects to the already-running `5.3` server.
 
@@ -35,12 +51,12 @@ Run server and Inspector together in one line:
 
 **PowerShell:**
 ```powershell
-Start-Process powershell -ArgumentList '-NoExit', '-Command', 'uv run python module05_enterprise/5.3_mcp_sdk_server.py'; Start-Sleep 2; npx @modelcontextprotocol/inspector
+Start-Process powershell -ArgumentList '-NoExit','-Command','uv run --with "mcp[cli]" python .\5.3_mcp_sdk_server.py'; Start-Sleep -Seconds 4; npx @modelcontextprotocol/inspector --transport http --server-url http://localhost:8000/mcp
 ```
 
 **bash / Git Bash:**
 ```bash
-uv run python module05_enterprise/5.3_mcp_sdk_server.py &
+uv run --with "mcp[cli]" python ./5.3_mcp_sdk_server.py &
 sleep 2 && npx @modelcontextprotocol/inspector
 ```
 
