@@ -15,6 +15,7 @@ uvicorn
 fastmcp
 mcp[cli]
 mcp
+langchain-mcp-adapters
 
 # Data & numerics
 numpy

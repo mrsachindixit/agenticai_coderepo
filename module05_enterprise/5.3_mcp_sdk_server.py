@@ -5,12 +5,14 @@ mcp = FastMCP("annotation-demo", stateless_http=True, json_response=True)
 
 @mcp.tool()
 def get_weather(city: str) -> str:
+    print(f"Received get_weather call with city: {city}")
     temps = {"london": "8°C", "tokyo": "22°C", "new york": "18°C", "bogotá": "12°C"}
     return f"{city}: {temps.get(city.lower(), '15°C')}, partly cloudy"
 
 
 @mcp.tool()
 def get_pincode(city: str) -> str:
+    print(f"Received get_pincode call with city: {city}")
     pincodes = {"london": "SW1A1AA", "tokyo": "100-0001", "new york": "10001", "bogotá": "110111"}
     return f"{city}: {pincodes.get(city.lower(), '000000')}"
 
