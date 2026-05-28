@@ -4,6 +4,7 @@ pydantic
 
 # LangChain ecosystem
 langchain
+langchain-anthropic
 langchain-community
 langchain-ollama
 langgraph
