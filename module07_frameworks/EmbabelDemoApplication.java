@@ -29,7 +29,7 @@
  * COMPARE WITH:
  *   - module01_raw/1.3_tool_single  : you write if/elif routing manually
  *   - module03_langchain/3.2        : LangChain agent loop, still imperative
- *   - 6.2_dspy_optimized_agent.py   : DSPy optimises prompts, you define pipeline
+ *   - 7.2_dspy_optimized_agent.py   : DSPy optimises prompts, you define pipeline
  *   - This file                     : declare goal + actions, Embabel plans
  *
  * PREREQUISITES:

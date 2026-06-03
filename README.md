@@ -144,23 +144,41 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 ### Module 04 · Production Concerns
 *Your agent works in a notebook — now make it safe, observable, and resilient. Each file adds one production dimension.*
 
-| File | What it teaches |
-|---|---|
-| `4.1_security_basic.py` | Input validation and prompt injection defence without a library |
-| `4.2_security_guardrails_ai.py` | Drop-in guardrails using the `guardrails-ai` framework |
-| `4.3_performance_basic.py` | Response caching and timeout handling to reduce latency |
-| `4.4_performance_production.py` | Retry logic with exponential back-off using `tenacity` |
-| `4.5_monitoring_basic.py` | Structured logging of every LLM call: latency, tokens, outcome |
-| `4.6_monitoring_opentelemetry.py` | OpenTelemetry traces and spans — agent calls become distributed traces |
-| `4.7_pii_basic.py` | Detect and redact PII with regex before data reaches the LLM |
-| `4.8_pii_presidio.py` | Production PII detection with Microsoft Presidio NER |
-| `4.9_pii_langchain.py` | Presidio wired into a LangChain chain as a preprocessing step |
-| `4.10_bias_guardrails.py` | Detect biased or harmful outputs and block or flag the response |
+| File | Category | What it teaches |
+|---|---|---|
+| `4.0_security_attacks_demo.py` | Attack Labs (Recap) | Recap lab: run multiple prompt/data/tool attack simulations side-by-side |
+| `4.1_security_basic.py` | Security Controls | Input validation and prompt injection defence without a library |
+| `4.2_security_guardrails_ai.py` | Security Controls | Drop-in guardrails using the `guardrails-ai` framework |
+| `4.3_performance_basic.py` | Performance | Response caching and timeout handling to reduce latency |
+| `4.4_performance_production.py` | Performance | Retry logic with exponential back-off using `tenacity` |
+| `4.5_monitoring_basic.py` | Observability | Structured logging of every LLM call: latency, tokens, outcome |
+| `4.6_monitoring_opentelemetry.py` | Observability | OpenTelemetry traces and spans — agent calls become distributed traces |
+| `4.7_pii_basic.py` | Data Protection | Detect and redact PII with regex before data reaches the LLM |
+| `4.8_pii_presidio.py` | Data Protection | Production PII detection with Microsoft Presidio NER |
+| `4.9_pii_langchain.py` | Data Protection | Presidio wired into a LangChain chain as a preprocessing step |
+| `4.10_bias_guardrails.py` | Safety & Policy | Detect biased or harmful outputs and block or flag the response |
+| `4.11_prompt_caching_anthropic.py` | Performance | Prompt caching in practice with cache-on/cache-off comparison and usage metrics |
+| `4.12_tool_auth_basic.py` | Security Controls | Basic tool authorization via scopes (allow/deny behavior) |
+| `4.13_mcp_tool_auth_basic.py` | Security Controls | MCP-style tool authorization pattern with scope checks |
+| `4.14_prompt_perf_basics.py` | Performance | Prompt focus, role design, and memory cleanup effects on latency/tokens |
+| `4.15_adaptive_model_routing.py` | Performance | Route simple vs complex queries to fast vs strong models |
+| `4.16_parallel_tools_timeout.py` | Performance | Parallel tool fan-out with timeout and partial-result handling |
+| `4.17_context_compaction.py` | Performance | Summarize old history and keep recent turns to shrink context window |
+| `4.18_token_budget_controls.py` | Performance | Input budget policy with deterministic truncation and output reserve |
+| `4.19_prompt_structure_and_params.py` | Performance | System/user prompt structuring and LLM parameter tuning for performance |
+| `4.20_request_dedup_coalescing.py` | Performance | Coalesce identical in-flight requests to avoid duplicate model work |
+| `4.21_timeout_fallback_ladder.py` | Performance | Timeout + fallback + degraded response strategy |
+| `4.22_attack_prompt_injection.py` | Attack Labs | Focused lab: direct and indirect prompt injection attack demos |
+| `4.23_attack_data_exfiltration.py` | Attack Labs | Focused lab: sensitive data exfiltration attack demo |
+| `4.24_attack_sql_and_tool_abuse.py` | Attack Labs | Focused lab: SQL abuse and privileged tool abuse attack demos |
+| `4.25_multi_llm_performance_routing.py` | Performance | Multi-LLM routing: fast vs deep model selection and latency comparison |
+| `4.26_multi_llm_security_crosscheck.py` | Security Controls | Two-model safety pattern: generator model + guard/reviewer model |
+| `4.27_output_format_perf_impact.py` | Performance | Output formatting impact on latency, size, and parseability |
 
 ---
 
-### Module 05 · Enterprise Protocols
-*Agents talking to agents over standard protocols — MCP for tool exposure, A2A for agent-to-agent messaging.*
+### Module 05 · Enterprise Integrations
+*Deploy and integrate agents using enterprise protocols such as MCP and A2A.*
 
 | File | What it teaches |
 |---|---|
@@ -174,15 +192,37 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 
 ---
 
-### Module 06 · Alternative Frameworks
-*Same agent problems solved by different tools — compare the trade-offs, pick the right tool for the job.*
+### Module 06 · Evaluation & Testing for LLM/Agent Systems
+*Learn how to measure quality, safety, cost, and regressions in LLM and agent workflows.*
 
 | File | What it teaches |
 |---|---|
-| `6.1_llamaindex_rag.py` | LlamaIndex RAG with Ollama embeddings — compare with `1.10` and `3.12` |
-| `6.2_dspy_optimized_agent.py` | DSPy: declare signatures and let `BootstrapFewShot` optimise prompts automatically |
-| `6.3_embabel_goal_agent.java` | Embabel (Java/Spring): `@Action` + `@Goal` — declarative planning, framework picks execution order |
-| `6.4_langchain_js_tool_call.mjs` | LangChain in JavaScript — same tool-call pattern as `3.1`, different runtime |
+| `6.0_eval_metrics_basics.py` | Core eval metrics: exact match, groundedness proxy, latency/cost signals |
+| `6.1_eval_golden_dataset.py` | Golden dataset construction and pass-rate scoring |
+| `6.2_eval_prompt_regression.py` | Prompt regression checks and format drift detection |
+| `6.3_eval_llm_judge_rubric.py` | Rubric-based judging pattern (relevance/correctness/clarity) |
+| `6.4_eval_agent_trajectory.py` | Agent path evaluation: tool choice, step budget, success |
+| `6.5_eval_safety_attacks.py` | Safety evals for attack blocking behavior |
+| `6.6_eval_rag_groundedness.py` | Groundedness checks using retrieved-context overlap |
+| `6.7_eval_cost_latency_tradeoff.py` | Quality/latency/cost trade-off comparison across variants |
+| `6.8_eval_ci_gate.py` | Release gating with thresholds for quality/safety/latency |
+| `6.9_eval_report_card.py` | Consolidated eval report and action-oriented summary |
+| `6.10_eval_planning_quality.py` | Planning eval: step coverage, dependency validity, and order quality |
+| `6.11_eval_replanning_recovery.py` | Replanning eval: failure recovery via retry/fallback/degraded modes |
+| `6.12_eval_multi_agent_handoff.py` | Multi-agent eval: delegation correctness, loop control, and termination |
+| `6.13_eval_multi_llm_jury.py` | Multi-LLM eval panel: dual-judge scoring with agreement/disagreement signal |
+
+---
+
+### Module 07 · Framework Integrations
+*Compare framework-specific patterns across Python, Java, and JavaScript runtimes.*
+
+| File | What it teaches |
+|---|---|
+| `7.1_llamaindex_rag.py` | LlamaIndex RAG with Ollama embeddings — compare with `1.10` and `3.12` |
+| `7.2_dspy_optimized_agent.py` | DSPy: declare signatures and let `BootstrapFewShot` optimise prompts automatically |
+| `7.3_embabel_goal_agent.java` | Embabel (Java/Spring): `@Action` + `@Goal` — declarative planning, framework picks execution order |
+| `7.4_langchain_js_tool_call.mjs` | LangChain in JavaScript — same tool-call pattern as `3.1`, different runtime |
 
 
 
