@@ -20,3 +20,8 @@ Use these rules for all educational samples in this repository.
 - One file should teach one clear idea.
 - Preserve progressive learning order across modules.
 - Favor deterministic scoring snippets around LLM calls so outcomes are inspectable.
+
+## Privacy and publication safety
+- The `agenticai_book/` content is draft and must be treated as private until explicitly published.
+- Do not copy manuscript prose, unpublished examples, or narrative text from `agenticai_book/` into public-facing code docs or repo files.
+- When syncing book and code, prefer path/anchor alignment and concept labels only; avoid transferring draft wording.

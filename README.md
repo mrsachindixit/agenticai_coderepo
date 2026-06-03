@@ -138,6 +138,7 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 | `3.14_multi_tool_orchestration.py` | Parallel and conditional tool fan-out in a single agent run |
 | `3.15_langgraph_coordinator.py` | LangGraph coordinator node that routes to worker subgraphs |
 | `3.16_lg_pause_resume_hitl.py` | Human-in-the-loop: graph pauses mid-run and waits for human approval |
+| `3.20_advanced_rag_query_rewrite_rerank.py` | Advanced RAG: query rewrite, rerank, and grounded answer synthesis |
 
 ---
 
@@ -174,6 +175,8 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 | `4.25_multi_llm_performance_routing.py` | Performance | Multi-LLM routing: fast vs deep model selection and latency comparison |
 | `4.26_multi_llm_security_crosscheck.py` | Security Controls | Two-model safety pattern: generator model + guard/reviewer model |
 | `4.27_output_format_perf_impact.py` | Performance | Output formatting impact on latency, size, and parseability |
+| `4.28_factfulness_hallucination_guard.py` | Safety & Policy | Factfulness guard: claim-support checks with abstain fallback |
+| `4.29_agentic_12_factors_scorecard.py` | Reliability | Practical 12-factor readiness scorecard for agent systems |
 
 ---
 
@@ -211,6 +214,9 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 | `6.11_eval_replanning_recovery.py` | Replanning eval: failure recovery via retry/fallback/degraded modes |
 | `6.12_eval_multi_agent_handoff.py` | Multi-agent eval: delegation correctness, loop control, and termination |
 | `6.13_eval_multi_llm_jury.py` | Multi-LLM eval panel: dual-judge scoring with agreement/disagreement signal |
+| `6.14_eval_advanced_rag.py` | Advanced RAG eval: baseline vs improved grounding outcomes |
+| `6.15_eval_factfulness.py` | Factfulness eval: supported-claim ratio under context constraints |
+| `6.16_eval_12_factors_readiness.py` | 12-factor eval: operational-readiness coverage scoring |
 
 ---
 
