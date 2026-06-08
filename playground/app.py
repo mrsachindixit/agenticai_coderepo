@@ -16,8 +16,8 @@ if mode=='Chat':
         st.success(out)
 else:
     st.title('RAG Explorer (Minimal)')
-    index_file = os.path.join(os.path.dirname(__file__), '..', 'module01_raw', '1.8_rag_basic', 'index.json')
-    st.markdown("Run `python module01_raw/1.8_rag_basic/build_index.py` to (re)build the small demo index.")
+    index_file = os.path.join(os.path.dirname(__file__), '..', 'module01_raw', '1.10_rag_basic', 'data', 'index.json')
+    st.markdown("Run `python module01_raw/1.10_rag_basic/build_index.py` to (re)build the small demo index.")
     st.caption(f"Index path: {index_file}")
     q = st.text_input('Question', 'How do agents use tools and memory?')
     k = st.slider('Top K', 1, 5, 3)

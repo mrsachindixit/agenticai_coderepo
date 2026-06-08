@@ -102,6 +102,9 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 | `1.8_tools_multi.py` | Multiple tools in one agent loop — LLM picks which to call |
 | `1.9_db_agent_sqlite.py` | Full agent that translates natural language to SQL and executes it |
 | `1.10_rag_basic/` | Retrieval-Augmented Generation from scratch: embed, store, retrieve, answer |
+| `1.11_ota_loop_from_scratch.py` | The bare Observe-Think-Act loop every agent reduces to — no framework |
+| `1.12_ralph_loop.py` | The Ralph Wiggum loop: dumbest agent that still works, terminated by real tests |
+| `1.13_rag_hybrid_bm25.py` | Hybrid retrieval: BM25 + dense + Reciprocal Rank Fusion + metadata filter |
 
 ---
 
@@ -114,6 +117,8 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 | `2.2_image_analysis.py` | Multi-modal input: pass an image to a vision-capable LLM |
 | `2.3_chat_obj_tool_single.py` | `model.bind_tools([...])` — single tool, same loop as `1.3` but framework-native |
 | `2.4_chat_obj_tool_multi.py` | Multiple tools bound to the model; LangChain handles the dispatch loop |
+| `2.7_cot_fewshot_self_consistency.py` | Zero-shot CoT, few-shot CoT, and self-consistency voting on the same problem |
+| `2.8_structured_output_response.py` | Enforce a Pydantic schema on the LLM **response** — three approaches, including retry-on-format-error |
 
 ---
 
@@ -137,8 +142,12 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 | `3.13_agent_tools_with_tool_seq.py` | Tools that themselves trigger further tool calls (tool chaining) |
 | `3.14_multi_tool_orchestration.py` | Parallel and conditional tool fan-out in a single agent run |
 | `3.15_langgraph_coordinator.py` | LangGraph coordinator node that routes to worker subgraphs |
-| `3.16_lg_pause_resume_hitl.py` | Human-in-the-loop: graph pauses mid-run and waits for human approval |
-| `3.20_advanced_rag_query_rewrite_rerank.py` | Advanced RAG: query rewrite, rerank, and grounded answer synthesis |
+| `3.20_advanced_rag_query_rewrite_rerank.py` | Advanced RAG: query rewrite, rerank (heuristic), and grounded answer synthesis |
+| `3.21_rag_cross_encoder_rerank.py` | Two-stage retrieval: bi-encoder for recall + real cross-encoder for precision |
+| `3.22_rag_hyde_multiquery.py` | Query rewriting techniques: HyDE, multi-query expansion, decomposition, step-back |
+| `3.23_mixture_of_agents.py` | Mixture-of-Agents: parallel proposers + aggregator synthesises a robust answer |
+| `3.24_multi_agent_deadlock_safety.py` | Hop limits, cycle detection, watchdog — prevent multi-agent runaway |
+| `3.25_critic_refiner_loop.py` | Critic-refiner **loop** with rubric scores and an iteration budget (vs. one-shot review in `3.4`) |
 
 ---
 
@@ -177,6 +186,11 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 | `4.27_output_format_perf_impact.py` | Performance | Output formatting impact on latency, size, and parseability |
 | `4.28_factfulness_hallucination_guard.py` | Safety & Policy | Factfulness guard: claim-support checks with abstain fallback |
 | `4.29_agentic_12_factors_scorecard.py` | Reliability | Practical 12-factor readiness scorecard for agent systems |
+| `4.30_semantic_cache.py` | Performance | Embedding-keyed response cache: paraphrases hit, exact-string caches miss |
+| `4.31_streaming_events_langgraph.py` | Performance | LangGraph state-event streaming, token streaming, and cancellation |
+| `4.32_persistent_checkpoint_sqlite.py` | Reliability | Durable conversations across process restarts with `SqliteSaver` |
+| `4.33_canary_shadow_deploy.py` | Reliability | Shadow + canary deployment of new prompts/models with auto-rollback |
+| `4.34_cost_attribution_tenant.py` | Reliability | Per-tenant / per-feature cost attribution and chargeback aggregation |
 
 ---
 
@@ -217,6 +231,8 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 | `6.14_eval_advanced_rag.py` | Advanced RAG eval: baseline vs improved grounding outcomes |
 | `6.15_eval_factfulness.py` | Factfulness eval: supported-claim ratio under context constraints |
 | `6.16_eval_12_factors_readiness.py` | 12-factor eval: operational-readiness coverage scoring |
+| `6.17_eval_exploratory_fuzz.py` | Exploratory fuzz eval: input mutations × safety assertions to find unknown failure modes |
+| `6.18_eval_human_annotation_queue.py` | Human-eval annotation queue with two-rater inter-annotator agreement (Cohen's kappa) |
 
 ---
 
@@ -308,14 +324,12 @@ streamlit run playground/app.py
 pytest -q
 ```
 
-### Run focused suites
+### Run module suite
 ```bash
-pytest evaluations/tests_unit -q
 pytest evaluations/tests_modules -q
-pytest evaluations/tests_samples -q
 ```
 
-`evaluations/tests_modules/` is the single-owner suite for module files (`module01_raw` -> `module05_enterprise`) with one self-contained test per source file.
+`evaluations/tests_modules/` is the canonical suite for module files (`module01_raw` -> `module05_enterprise`) with one self-contained test per source file.
 
 ---
 
