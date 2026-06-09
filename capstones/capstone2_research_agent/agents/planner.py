@@ -2,6 +2,29 @@ import os, sys, json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from utils.ollama_client import chat
 
+VALID_ACTIONS = {"search", "ingest", "read", "extract", "synthesize", "summarize"}
+
+
+def _validate_plan(plan: dict) -> dict:
+    steps = plan.get("steps", [])
+    issues = []
+    if not isinstance(steps, list) or not steps:
+        issues.append("steps_missing")
+        return {"ok": False, "issues": issues}
+
+    seen = set()
+    for step in steps:
+        sid = step.get("id")
+        action = (step.get("action") or "").strip().lower()
+        if sid in seen:
+            issues.append(f"duplicate_step_id:{sid}")
+        seen.add(sid)
+        if action not in VALID_ACTIONS:
+            issues.append(f"invalid_action:{action or 'empty'}")
+        if not step.get("description"):
+            issues.append(f"missing_description:{sid}")
+    return {"ok": not issues, "issues": issues}
+
 def plan_research(prompt: str) -> dict:
     """Produce a structured research plan as JSON.
 
@@ -30,4 +53,10 @@ def plan_research(prompt: str) -> dict:
                 {"id": 4, "action": "synthesize", "description": "Create a short synthesis", "tools": ["synthesizer"]}
             ]
         }
+    check = _validate_plan(plan)
+    plan["quality_gate"] = {
+        "valid": check["ok"],
+        "issues": check["issues"],
+        "note": "Planner output must pass structural checks before execution.",
+    }
     return plan

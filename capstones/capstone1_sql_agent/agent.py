@@ -2,14 +2,43 @@ import json
 import sqlite3
 import os
 from typing import Any, Dict
+import re
 
 from utils.ollama_client import chat
 
 FORBIDDEN = [';','--','drop','delete','update','insert','alter','attach','pragma','create','vacuum']
+RISKY_PATTERNS = [
+    (r"\bjoin\b", 2),
+    (r"\bgroup\s+by\b", 2),
+    (r"\bhaving\b", 2),
+    (r"\bwith\b", 3),
+    (r"\border\s+by\b", 1),
+    (r"\bcount\s*\(", 1),
+    (r"\bsum\s*\(", 1),
+    (r"\bavg\s*\(", 1),
+    (r"\bdistinct\b", 1),
+]
 
 def safe(sql: str) -> bool:
     s = sql.strip().lower()
     return s.startswith('select') and not any(b in s for b in FORBIDDEN)
+
+
+def risk_score(sql: str) -> tuple[int, list[str]]:
+    s = sql.strip().lower()
+    score = 1
+    reasons = []
+    for pat, weight in RISKY_PATTERNS:
+        if re.search(pat, s):
+            score += weight
+            reasons.append(f"matched:{pat}")
+    if " limit " not in f" {s} ":
+        score += 2
+        reasons.append("no_limit")
+    if len(s) > 220:
+        score += 1
+        reasons.append("long_query")
+    return score, reasons
 
 
 class SQLiteAnalystAgent:
@@ -81,9 +110,17 @@ class SQLiteAnalystAgent:
             explain = "Fallback query: return up to 50 employees."
         return {"sql": sql, "explanation": explain}
 
-    def execute(self, sql: str, limit: int = 100) -> Dict[str, Any]:
+    def execute(self, sql: str, limit: int = 100, require_approval_above: int = 6, approved: bool = False) -> Dict[str, Any]:
         if not safe(sql):
             return {"error": "unsafe_sql"}
+        score, reasons = risk_score(sql)
+        if score >= require_approval_above and not approved:
+            return {
+                "error": "approval_required",
+                "risk_score": score,
+                "risk_reasons": reasons,
+                "message": "Query looks complex/risky for classroom mode. Re-run with approval.",
+            }
         conn = self._connect()
         cur = conn.cursor()
         # apply an upper-bound limit if missing
@@ -95,7 +132,13 @@ class SQLiteAnalystAgent:
             rows = cur.fetchall()
             cols = [d[0] for d in cur.description] if cur.description else []
             conn.close()
-            return {"columns": cols, "rows": rows, "rowcount": len(rows)}
+            return {
+                "columns": cols,
+                "rows": rows,
+                "rowcount": len(rows),
+                "risk_score": score,
+                "risk_reasons": reasons,
+            }
         except Exception as e:
             conn.close()
             return {"error": "execution_error", "message": str(e)}
@@ -128,14 +171,23 @@ class SQLiteAnalystAgent:
         except Exception:
             return f"Returned {len(rows)} rows. Example row: {preview[:1]}"
 
-    def handle(self, nlq: str) -> Dict[str, Any]:
+    def handle(self, nlq: str, approved: bool = False) -> Dict[str, Any]:
         """Main flow: propose SQL, execute, explain plan, summarize."""
         proposal = self.suggest_sql(nlq)
         sql = proposal.get('sql','')
         explanation = proposal.get('explanation','')
         if not sql:
             return {"error":"no_sql_generated","proposal":proposal}
-        exec_res = self.execute(sql)
+        exec_res = self.execute(sql, approved=approved)
+        if exec_res.get("error") == "approval_required":
+            return {
+                "nlq": nlq,
+                "sql": sql,
+                "sql_explanation": explanation,
+                "plan": "approval_blocked",
+                "result": exec_res,
+                "summary": "Execution blocked pending approval for high-risk query.",
+            }
         plan = self.explain(sql)
         summary = self.summarize(nlq, exec_res)
         return {
