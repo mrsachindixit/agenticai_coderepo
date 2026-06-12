@@ -30,5 +30,3 @@ python-dotenv
 # openai
 openai
 faiss-cpu
-
-guardrails-ai

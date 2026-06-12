@@ -16,7 +16,7 @@ def _find_repo_root(start: Path) -> Path:
 
 
 ROOT = _find_repo_root(Path(__file__).resolve())
-TARGET = ROOT / "module06_enterprise/6.5_a2a_demo.py"
+TARGET = ROOT / "module05_security/5.9_bias_guardrails.py"
 
 
 def test_target_exists() -> None:

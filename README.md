@@ -151,100 +151,97 @@ Follow the modules in order — each one builds on the previous. The arc moves f
 
 ---
 
-### Module 04 · Production Concerns
-*Your agent works in a notebook — now make it safe, observable, and resilient. Each file adds one production dimension.*
+### Module 04 · Production — Performance & Reliability
+*Your agent works in a notebook — now make it fast, cheap, observable, and resilient. Each file adds one production dimension.*
 
 | File | Category | What it teaches |
 |---|---|---|
-| `4.0_security_attacks_demo.py` | Attack Labs (Recap) | Recap lab: run multiple prompt/data/tool attack simulations side-by-side |
-| `4.1_security_basic.py` | Security Controls | Input validation and prompt injection defence without a library |
-| `4.2_security_guardrails_ai.py` | Security Controls | Drop-in guardrails using the `guardrails-ai` framework |
-| `4.3_performance_basic.py` | Performance | Response caching and timeout handling to reduce latency |
-| `4.4_performance_production.py` | Performance | Retry logic with exponential back-off using `tenacity` |
-| `4.5_monitoring_basic.py` | Observability | Structured logging of every LLM call: latency, tokens, outcome |
-| `4.6_monitoring_opentelemetry.py` | Observability | OpenTelemetry traces and spans — agent calls become distributed traces |
-| `4.7_pii_basic.py` | Data Protection | Detect and redact PII with regex before data reaches the LLM |
-| `4.8_pii_presidio.py` | Data Protection | Production PII detection with Microsoft Presidio NER |
-| `4.9_pii_langchain.py` | Data Protection | Presidio wired into a LangChain chain as a preprocessing step |
-| `4.10_bias_guardrails.py` | Safety & Policy | Detect biased or harmful outputs and block or flag the response |
-| `4.11_prompt_caching_anthropic.py` | Performance | Prompt caching in practice with cache-on/cache-off comparison and usage metrics |
-| `4.12_tool_auth_basic.py` | Security Controls | Basic tool authorization via scopes (allow/deny behavior) |
-| `4.13_mcp_tool_auth_basic.py` | Security Controls | MCP-style tool authorization pattern with scope checks |
-| `4.14_prompt_perf_basics.py` | Performance | Prompt focus, role design, and memory cleanup effects on latency/tokens |
-| `4.15_adaptive_model_routing.py` | Performance | Route simple vs complex queries to fast vs strong models |
-| `4.16_parallel_tools_timeout.py` | Performance | Parallel tool fan-out with timeout and partial-result handling |
-| `4.17_context_compaction.py` | Performance | Summarize old history and keep recent turns to shrink context window |
-| `4.18_token_budget_controls.py` | Performance | Input budget policy with deterministic truncation and output reserve |
-| `4.19_prompt_structure_and_params.py` | Performance | System/user prompt structuring and LLM parameter tuning for performance |
-| `4.20_request_dedup_coalescing.py` | Performance | Coalesce identical in-flight requests to avoid duplicate model work |
-| `4.21_timeout_fallback_ladder.py` | Performance | Timeout + fallback + degraded response strategy |
-| `4.22_attack_prompt_injection.py` | Attack Labs | Focused lab: direct and indirect prompt injection attack demos |
-| `4.23_attack_data_exfiltration.py` | Attack Labs | Focused lab: sensitive data exfiltration attack demo |
-| `4.24_attack_sql_and_tool_abuse.py` | Attack Labs | Focused lab: SQL abuse and privileged tool abuse attack demos |
-| `4.25_multi_llm_performance_routing.py` | Performance | Multi-LLM routing: fast vs deep model selection and latency comparison |
-| `4.26_multi_llm_security_crosscheck.py` | Security Controls | Two-model safety pattern: generator model + guard/reviewer model |
-| `4.27_output_format_perf_impact.py` | Performance | Output formatting impact on latency, size, and parseability |
-| `4.28_factfulness_hallucination_guard.py` | Safety & Policy | Factfulness guard: claim-support checks with abstain fallback |
-| `4.29_agentic_12_factors_scorecard.py` | Reliability | Practical 12-factor readiness scorecard for agent systems |
-| `4.30_semantic_cache.py` | Performance | Embedding-keyed response cache: paraphrases hit, exact-string caches miss |
-| `4.31_streaming_events_langgraph.py` | Performance | LangGraph state-event streaming, token streaming, and cancellation |
-| `4.32_persistent_checkpoint_sqlite.py` | Reliability | Durable conversations across process restarts with `SqliteSaver` |
-| `4.33_canary_shadow_deploy.py` | Reliability | Shadow + canary deployment of new prompts/models with auto-rollback |
-| `4.34_cost_attribution_tenant.py` | Reliability | Per-tenant / per-feature cost attribution and chargeback aggregation |
+| `4.1_prompt_structure_and_params.py` | Prompting | System/user prompt structuring and LLM parameter tuning for performance |
+| `4.2_prompt_perf_basics.py` | Prompting | Prompt focus, role design, and memory cleanup effects on latency/tokens |
+| `4.3_output_format_perf_impact.py` | Prompting | Output formatting impact on latency, size, and parseability |
+| `4.4_prompt_caching_anthropic.py` | Prompting | Prompt caching with cache-on/cache-off comparison and usage metrics |
+| `4.5_context_compaction.py` | Context & Cost | Summarize old history and keep recent turns to shrink context window |
+| `4.6_token_budget_controls.py` | Context & Cost | Input budget policy with deterministic truncation and output reserve |
+| `4.7_request_dedup_coalescing.py` | Context & Cost | Coalesce identical in-flight requests to avoid duplicate model work |
+| `4.8_cost_attribution_tenant.py` | Context & Cost | Per-tenant / per-feature cost attribution and chargeback aggregation |
+| `4.9_parallel_tools_timeout.py` | Latency & Resilience | Parallel tool fan-out with timeout and partial-result handling |
+| `4.10_timeout_fallback_ladder.py` | Latency & Resilience | Timeout + fallback + degraded response strategy |
+| `4.11_multi_llm_performance_routing.py` | Latency & Resilience | Complexity-based routing: fast vs deep model selection and latency comparison |
+| `4.12_streaming_events_langgraph.py` | Latency & Resilience | LangGraph state-event streaming, token streaming, and cancellation |
+| `4.13_monitoring_basic.py` | Observability | Structured logging of every LLM call: latency, tokens, outcome |
+| `4.14_monitoring_opentelemetry.py` | Observability | OpenTelemetry traces and spans — agent calls become distributed traces |
 
 ---
 
-### Module 05 · Enterprise Integrations
+### Module 05 · Production — Security & Safety
+*The other half of going to production: defend against attacks, lock down tools, protect data, and check your readiness.*
+
+| File | Category | What it teaches |
+|---|---|---|
+| `5.1_security_attacks_diy.py` | Attacks | DIY attack lab: fire injection / exfiltration / SQL+tool-abuse at a live agent and watch the guard |
+| `5.2_security_basic.py` | Defences | Input validation and prompt injection defence without a library |
+| `5.3_multi_llm_security_crosscheck.py` | Defences | Two-model safety pattern: generator model + guard/reviewer model |
+| `5.4_tool_auth_basic.py` | Authorization | Basic tool authorization via scopes (allow/deny behavior) |
+| `5.5_mcp_tool_auth_basic.py` | Authorization | MCP-style tool authorization pattern with scope checks |
+| `5.6_pii_basic.py` | Data Protection | Detect and redact PII with regex before data reaches the LLM |
+| `5.7_pii_presidio.py` | Data Protection | Production PII detection with Microsoft Presidio NER |
+| `5.8_pii_langchain.py` | Data Protection | Presidio wired into a LangChain chain as a preprocessing step |
+| `5.9_bias_guardrails.py` | Safety & Policy | Detect biased or harmful outputs and block or flag the response |
+| `5.10_agentic_12_factors.py` | Reliability | The 12 factors of a production agent — theory + a quick self-check |
+
+---
+
+---
+
+### Module 06 · Enterprise Integrations
 *Deploy and integrate agents using enterprise protocols such as MCP and A2A.*
 
 | File | What it teaches |
 |---|---|
-| `5.1_mcp_server.py` | Build an MCP server from scratch using FastAPI — understand the envelope protocol |
-| `5.2_mcp_client.py` | HTTP client that calls the `5.1` server's tools and reads its resources |
-| `5.3_mcp_sdk_server.py` | Same server rebuilt with the official `mcp` SDK: `@mcp.tool`, `@mcp.resource`, `@mcp.prompt`, and a real LLM call via `Context` |
-| `5.4_mcp_sdk_client.py` | Async `ClientSession` that invokes tools, reads resources, and fetches prompts from `5.3` |
-| `5.5_a2a_demo.py` | Agent-to-Agent in one file: two Ollama-backed agents passing messages to each other |
-| `5.6_a2a_server.py` | A2A server — registers agents, routes messages, maintains inboxes |
-| `5.7_a2a_client.py` | A2A client — registers, sends messages, polls inbox |
+| `6.1_mcp_server.py` | Build an MCP server from scratch using FastAPI — understand the envelope protocol |
+| `6.2_mcp_client.py` | HTTP client that calls the `6.1` server's tools and reads its resources |
+| `6.3_mcp_sdk_server.py` | Same server rebuilt with the official `mcp` SDK: `@mcp.tool`, `@mcp.resource`, `@mcp.prompt`, and a real LLM call via `Context` |
+| `6.4_mcp_sdk_client.py` | Async `ClientSession` that invokes tools, reads resources, and fetches prompts from `6.3` |
+| `6.5_a2a_demo.py` | Agent-to-Agent in one file: two Ollama-backed agents passing messages to each other |
+| `6.6_a2a_server.py` | A2A server — registers agents, routes messages, maintains inboxes |
+| `6.7_a2a_client.py` | A2A client — registers, sends messages, polls inbox |
 
 ---
 
-### Module 06 · Evaluation & Testing for LLM/Agent Systems
+### Module 07 · Evaluation & Testing for LLM/Agent Systems
 *Learn how to measure quality, safety, cost, and regressions in LLM and agent workflows.*
 
 | File | What it teaches |
 |---|---|
-| `6.0_eval_metrics_basics.py` | Core eval metrics: exact match, groundedness proxy, latency/cost signals |
-| `6.1_eval_golden_dataset.py` | Golden dataset construction and pass-rate scoring |
-| `6.2_eval_prompt_regression.py` | Prompt regression checks and format drift detection |
-| `6.3_eval_llm_judge_rubric.py` | Rubric-based judging pattern (relevance/correctness/clarity) |
-| `6.4_eval_agent_trajectory.py` | Agent path evaluation: tool choice, step budget, success |
-| `6.5_eval_safety_attacks.py` | Safety evals for attack blocking behavior |
-| `6.6_eval_rag_groundedness.py` | Groundedness checks using retrieved-context overlap |
-| `6.7_eval_cost_latency_tradeoff.py` | Quality/latency/cost trade-off comparison across variants |
-| `6.8_eval_ci_gate.py` | Release gating with thresholds for quality/safety/latency |
-| `6.9_eval_report_card.py` | Consolidated eval report and action-oriented summary |
-| `6.10_eval_planning_quality.py` | Planning eval: step coverage, dependency validity, and order quality |
-| `6.11_eval_replanning_recovery.py` | Replanning eval: failure recovery via retry/fallback/degraded modes |
-| `6.12_eval_multi_agent_handoff.py` | Multi-agent eval: delegation correctness, loop control, and termination |
-| `6.13_eval_multi_llm_jury.py` | Multi-LLM eval panel: dual-judge scoring with agreement/disagreement signal |
-| `6.14_eval_advanced_rag.py` | Advanced RAG eval: baseline vs improved grounding outcomes |
-| `6.15_eval_factfulness.py` | Factfulness eval: supported-claim ratio under context constraints |
-| `6.16_eval_12_factors_readiness.py` | 12-factor eval: operational-readiness coverage scoring |
-| `6.17_eval_exploratory_fuzz.py` | Exploratory fuzz eval: input mutations × safety assertions to find unknown failure modes |
-| `6.18_eval_human_annotation_queue.py` | Human-eval annotation queue with two-rater inter-annotator agreement (Cohen's kappa) |
+| `7.0_eval_metrics_basics.py` | Core eval metrics: exact match, groundedness proxy, latency/cost signals |
+| `7.1_eval_golden_dataset.py` | Golden dataset with clean, dirty, bias, and edge cases — must-include/must-not-include scoring |
+| `7.2_eval_prompt_regression.py` | Prompt regression checks and format drift detection |
+| `7.3_eval_llm_judge_rubric.py` | Rubric-based judging pattern (relevance/correctness/clarity) |
+| `7.4_eval_agent_trajectory.py` | Agent path evaluation: tool choice, step budget, success |
+| `7.5_eval_safety_attacks.py` | Safety evals for attack blocking behavior |
+| `7.6_eval_rag_groundedness.py` | Groundedness checks using retrieved-context overlap |
+| `7.7_eval_cost_latency_tradeoff.py` | Two trade-offs side by side: accuracy-per-second (latency) and accuracy-per-cost |
+| `7.8_eval_ci_gate.py` | Release gating with thresholds for quality/safety/latency |
+| `7.9_eval_report_card.py` | Consolidated eval report and action-oriented summary |
+| `7.10_eval_planning_quality.py` | Planning eval: step coverage, dependency validity, and order quality |
+| `7.11_eval_replanning_recovery.py` | Replanning eval: failure recovery via retry/fallback/degraded modes |
+| `7.12_eval_multi_agent_handoff.py` | Multi-agent eval: delegation correctness, loop control, and termination |
+| `7.13_eval_multi_llm_jury.py` | Multi-LLM eval panel: dual-judge scoring with agreement/disagreement signal |
+| `7.14_eval_advanced_rag.py` | Advanced RAG eval: baseline vs improved grounding outcomes |
+| `7.15_eval_factfulness.py` | Factfulness eval: supported-claim ratio under context constraints |
+| `7.16_eval_react_multi_agent.py` | ReAct discipline eval in a multi-agent run: reason-before-act, valid delegation, termination |
 
 ---
 
-### Module 07 · Framework Integrations
+### Module 08 · Framework Integrations
 *Compare framework-specific patterns across Python, Java, and JavaScript runtimes.*
 
 | File | What it teaches |
 |---|---|
-| `7.1_llamaindex_rag.py` | LlamaIndex RAG with Ollama embeddings — compare with `1.10` and `3.12` |
-| `7.2_dspy_optimized_agent.py` | DSPy: declare signatures and let `BootstrapFewShot` optimise prompts automatically |
-| `7.3_embabel_goal_agent.java` | Embabel (Java/Spring): `@Action` + `@Goal` — declarative planning, framework picks execution order |
-| `7.4_langchain_js_tool_call.mjs` | LangChain in JavaScript — same tool-call pattern as `3.1`, different runtime |
+| `8.1_llamaindex_rag.py` | LlamaIndex RAG with Ollama embeddings — compare with `1.10` and `3.12` |
+| `8.2_dspy_optimized_agent.py` | DSPy: declare signatures and let `BootstrapFewShot` optimise prompts automatically |
+| `8.3_embabel_goal_agent.java` | Embabel (Java/Spring): `@Action` + `@Goal` — declarative planning, framework picks execution order |
+| `8.4_langchain_js_tool_call.mjs` | LangChain in JavaScript — same tool-call pattern as `3.1`, different runtime |
 
 
 
@@ -289,17 +286,35 @@ The intended flow is:
 
 Build an end-to-end agent that lets non-technical business users ask plain-English questions against a **multi-table relational SQLite database** and receive safe, accurate, human-readable answers. Your agent should automatically discover the live schema (tables, columns, types, relationships, plus sample rows) so the LLM never hallucinates column names. It must generate SQL through a tightly prompted LLM call that returns structured JSON — not free text — and it should be capable of producing JOINs, aggregations, CTEs, and grouped queries, not just flat `SELECT *` statements. Before executing anything, the agent must enforce a read-only safety guard (allowlist + blocklist) and auto-append a `LIMIT` when missing. After execution, expose the query plan (`EXPLAIN QUERY PLAN`) for observability, and make a second LLM call to summarize the raw result into a concise business narrative. Seed your database with at least five interrelated tables (departments, employees with self-referencing managers, projects, a many-to-many junction, salary history) — a single flat table makes every query trivial and defeats the purpose. Deliver a CLI that accepts a natural-language question and prints the generated SQL, the intent explanation, the query plan, a result preview, and the business summary.
 
+**Advanced requirements — what makes this capstone yours:**
+- **Self-correcting SQL loop.** When a generated query throws a SQLite error (bad column, ambiguous join, syntax), do **not** fail — feed the exact error message plus the schema back to the model and let it repair the query, bounded to a small retry budget (e.g. 3). Print every repair attempt so the student can see the agent reasoning its way to a working query.
+- **Risk scoring + human approval gate.** Score each query for blast radius (joins, CTEs, missing `LIMIT`, length) and **refuse to auto-execute** anything above a threshold until a human approves it. The refusal must explain *why* it scored high. (A reference scoring scheme lives in the implementation — design your own first.)
+- **Ambiguity → clarifying question.** If the question maps plausibly to more than one column/table (e.g. "revenue" when there are three money columns), the agent must ask **one** targeted clarifying question instead of silently guessing.
+- **Cost-aware plan reading.** Parse `EXPLAIN QUERY PLAN` and translate it into a plain-English warning when the query will do a full table scan vs. use an index — so the business user understands *why* a question is slow.
+
 ---
 
 ### Assignment 2 — Research Agent
 
 Build a **planner/executor research assistant** that takes a high-level research prompt (e.g., *"Survey methods for low-resource named-entity recognition"*), decomposes it into a structured plan, executes each step using specialised tools, and produces an evidence-backed synthesis. The planner should be an LLM call that outputs a structured JSON plan with ordered steps (search, ingest, extract, synthesize) — include a deterministic fallback when the model returns invalid JSON. The executor should iterate over the plan, dispatch each step to the right tool, and **persist every intermediate result** to disk as timestamped JSON so the research trail is auditable. You will need at least three tools: a web/paper search tool (a placeholder with a production-shaped interface is fine), a PDF/text ingestion tool that walks a folder and extracts full text with structured metadata, and an LLM summarizer with a heuristic fallback when the model is unreachable. The crown jewel is a full **RAG pipeline** — chunk ingested documents, embed them into a Chroma vector store, load a similarity retriever, and answer follow-up questions grounded in document context with source citations. Design the embedding and chat functions as injectable parameters (not hard-coded) so you can write unit tests with deterministic fakes instead of depending on a live Ollama server. Deliver a CLI that prints the plan, executes every step, and writes all notes plus a final synthesis to `data/notes/`.
 
+**Advanced requirements — what makes this capstone yours:**
+- **Plan quality gate before execution.** Before running a single step, validate the plan: every step's dependency must reference an earlier step, there must be no cycles, and the step types must cover the goal (you can't synthesize before you ingest). Reject and **re-plan** if the gate fails — never execute an incoherent plan.
+- **Dependency-aware execution with recovery.** Execute steps in dependency order, passing prior outputs forward. When a step fails, retry with a degraded strategy (e.g. summarizer falls back to a heuristic) rather than aborting the whole run — and record the degradation in the audit trail.
+- **Citation-faithful synthesis (no unsupported claims).** Every sentence in the final synthesis must map to at least one retrieved chunk. Sentences with no supporting evidence must be dropped or explicitly flagged as `[unverified]`. The agent should report a *grounding ratio* (supported sentences / total).
+- **Contradiction surfacing.** When two sources disagree on a fact, the synthesis must **say so** ("Source A reports X; Source B reports Y") instead of silently picking one or averaging them.
+
 ---
 
 ### Assignment 3 — Standalone RAG Agent
 
 Build a **conversational RAG agent** that ingests a local collection of PDF documents, constructs a persistent vector index, and then enters an interactive chat loop where every answer is grounded in retrieved context and aware of prior conversation turns. The ingestion module should recursively walk a data directory, extract text page-by-page (handling empty pages gracefully), and carry source/title metadata through the entire pipeline. The index builder should split documents into configurable chunks, embed them with Ollama, store in Chroma, and persist to disk — expose CLI flags for chunk size, overlap, and directories so students can experiment with retrieval quality. Conversation memory is critical: maintain a rolling history so the agent can resolve follow-ups like *"Tell me more about that"* — without it every turn is independent and the agent feels broken. Each prompt should be composed of three clear blocks: system instructions (answer from context, cite sources), the concatenated retrieved chunks, and the conversation history. Use a `.env` file for all Ollama configuration and let CLI flags override env vars. Deliver three independently runnable entry points: (a) ingest PDFs, (b) build/update the index, (c) launch the interactive conversational agent.
+
+**Advanced requirements — what makes this capstone yours:**
+- **History-aware query rewriting before retrieval.** A follow-up like *"tell me more about that"* retrieves garbage if sent to the vector store as-is. Before retrieving, the agent must rewrite the follow-up into a **standalone query** using the conversation history ("more about *the 2023 refund policy change*"), then retrieve on the rewritten query. Print both the raw and rewritten query so the effect is visible.
+- **Answerability / abstain gate with confidence.** Score how well the retrieved chunks actually cover the question. If coverage is below a threshold, the agent must **abstain** ("I don't have enough in these documents to answer that") rather than hallucinate a confident-sounding answer. Report a confidence value with each answer.
+- **Inline citations that can be checked.** Every answer must cite the specific source + page it drew from, and a `--verify` mode should print the exact retrieved chunk behind each citation so a reader can confirm the answer wasn't invented.
+- **Retrieval self-check + one re-try.** After retrieving, the agent grades whether the chunks are relevant; if they're weak, it rewrites the query once more and re-retrieves before answering — a single, bounded self-correction loop.
 
 ---
 
@@ -329,7 +344,7 @@ pytest -q
 pytest evaluations/tests_modules -q
 ```
 
-`evaluations/tests_modules/` is the canonical suite for module files (`module01_raw` -> `module05_enterprise`) with one self-contained test per source file.
+`evaluations/tests_modules/` is the canonical suite for module files (`module01_raw` -> `module06_enterprise`) with one self-contained test per source file.
 
 ---
 
