@@ -18,7 +18,7 @@ Settings.chunk_size = 512
 Settings.chunk_overlap = 64
 
 DATA_DIR = os.path.join(
-    os.path.dirname(__file__), "..", "module01_raw", "1.8_rag_basic", "data"
+    os.path.dirname(__file__), "..", "module01_raw", "1.10_rag_basic", "data"
 )
 
 def build_index():

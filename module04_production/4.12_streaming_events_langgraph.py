@@ -34,7 +34,10 @@ def demo_state_events(question: str) -> None:
     print("\n=== mode='updates' (state-level) ===")
     for event in graph.stream({"question": question}, stream_mode="updates"):
         for node, delta in event.items():
-            preview = next(iter(delta.values()))[:70] if delta else ""
+            preview = ""
+            if delta:
+                first_value = list(delta.values())[0]   # the one field this node wrote
+                preview = str(first_value)[:70]
             print(f"  [event] node={node!r:<12} preview={preview!r}")
 
 

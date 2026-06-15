@@ -1,15 +1,4 @@
-"""The 12 factors of a production-grade agent - theory + quick self-check.
-
-This is a reference, not a framework. Each factor names ONE thing that separates
-a notebook demo from an agent you can run in production. Read the principle, then
-the "smell" that tells you the factor is missing.
-
-Mental model: a notebook agent optimizes for "did it answer once?".
-A production agent optimizes for "will it behave the same, safely, the 10,000th
-time, when inputs are weird and a tool is down?".
-"""
-
-# factor -> (principle, the smell when it's missing)
+# factor -> (principle, the smell when it's missing). Edit/extend and re-run.
 FACTORS = {
     "1. Clear goal": (
         "The agent has one explicit, testable objective per run.",

@@ -1,5 +1,3 @@
-"""Build a minimal RAG index from text documents using Ollama embeddings."""
-
 import os
 import json
 import glob
@@ -14,14 +12,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 OUT_FILE = "index.json"
 
 def load_docs(path=os.path.join(os.path.dirname(__file__), "data", "*.txt")):
-    """Load text documents from a directory pattern.
-    
-    Args:
-        path: Glob pattern for text files (default: data/*.txt)
-    
-    Returns:
-        List of dicts with 'id' (filename) and 'text' (content)
-    """
     docs = []
     for fp in glob.glob(path):
         with open(fp, "r", encoding="utf-8") as f:

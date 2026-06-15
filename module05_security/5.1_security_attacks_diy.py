@@ -1,17 +1,3 @@
-"""Do-It-Yourself prompt-attack lab.
-
-This is hands-on, not an eval harness. You fire real attack payloads at a real
-local LLM agent that is hiding a secret, and you watch whether it leaks. Then you
-turn on a minimal guard and fire the same payloads again to feel the difference.
-
-Try this:
-  1. Run as-is and read what the NAIVE agent does on each attack.
-  2. Add your own payload to ATTACKS and re-run.
-  3. Weaken/strengthen the guard functions and watch the GUARDED column change.
-
-Covers: direct + indirect prompt injection, data exfiltration, SQL/tool abuse.
-"""
-
 import re
 
 from utils.ollama_client import chat

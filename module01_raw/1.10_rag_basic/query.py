@@ -1,6 +1,4 @@
-﻿"""Query a RAG index: retrieve documents and augment LLM prompt with context."""
-
-import json
+﻿import json
 import sys
 import os
 import requests
@@ -13,22 +11,12 @@ from utils.ollama_client import embed, chat
 INDEX_FILE = "index.json"
 
 def cosine(a, b):
-    """Compute cosine similarity between two vectors."""
     a = np.array(a)
     b = np.array(b)
     norm_product = np.linalg.norm(a) * np.linalg.norm(b) + 1e-9
     return float(a @ b) / norm_product
 
 def search(query, k=3):
-    """Search the index for top-k documents similar to query.
-    
-    Args:
-        query: Query string
-        k: Number of top results to return
-    
-    Returns:
-        List of top-k matching documents with scores
-    """
     index_file_path=os.path.join(os.path.dirname(__file__), "data", INDEX_FILE)
     if not os.path.exists(index_file_path):
         raise FileNotFoundError(
@@ -59,20 +47,7 @@ def search(query, k=3):
     return scored[:k]
 
 def rag_answer(query, k=3):
-    """Retrieve context and ask LLM with augmented context (basic RAG).
-    
-    This implements Retrieval-Augmented Generation:
-    1. Retrieve top-k documents by embedding similarity
-    2. Augment prompt with retrieved context
-    3. Ask LLM to answer using the context
-    
-    Args:
-        query: User query
-        k: Number of documents to retrieve
-    
-    Returns:
-        LLM response grounded in retrieved context
-    """
+    # Retrieve top-k by embedding similarity, then answer grounded in that context.
     top = search(query, k=k)
     
     # Build context string from top documents

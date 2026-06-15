@@ -51,7 +51,7 @@ import sys
 
 import numpy as np
 
-INDEX_FILE = ROOT / "module01_raw/1.8_rag_basic/index.json"
+INDEX_FILE = ROOT / "module01_raw/1.10_rag_basic/data/index.json"
 
 sys.path.append(str(ROOT))
 from utils.ollama_client import embed
@@ -65,7 +65,7 @@ def cosine(a, b) -> float:
 
 @pytest.mark.skipif(not INDEX_FILE.exists(), reason="Run module01_raw/1.10_rag_basic/build_index.py to create the RAG index")
 def test_rag_index_exists_for_basic_flow() -> None:
-    assert INDEX_FILE.exists(), "Expected RAG index at module01_raw/1.8_rag_basic/index.json"
+    assert INDEX_FILE.exists(), "Expected RAG index at module01_raw/1.10_rag_basic/data/index.json"
 
 
 @pytest.mark.skipif(not INDEX_FILE.exists(), reason="Run module01_raw/1.10_rag_basic/build_index.py to create the RAG index")

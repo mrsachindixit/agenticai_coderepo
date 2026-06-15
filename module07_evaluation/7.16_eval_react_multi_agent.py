@@ -1,21 +1,3 @@
-"""ReAct evaluation in a multi-agent setting.
-
-6.4 checks the agent's tool trajectory; 6.12 checks handoffs between agents.
-This file checks something they don't: ReAct DISCIPLINE inside a multi-agent run.
-
-ReAct = the agent interleaves Thought -> Action -> Observation before answering.
-In a multi-agent flow, a supervisor reasons about WHO to delegate to, calls a
-specialist (the "action"), reads its result (the "observation"), then reasons
-again. A common failure is "action without thought": the model fires tools with
-no reasoning, or never delegates, or never stops.
-
-We ask the model for a strict-JSON ReAct trace for a supervised task and score:
-  - reasons_before_acting : every action step has a non-empty thought
-  - valid_tools           : actions only call known specialist tools
-  - delegated             : at least one action delegates to a specialist
-  - terminated            : trace ends with a final_answer step
-"""
-
 import json
 
 from utils.ollama_client import chat

@@ -1,16 +1,7 @@
 import time
-from dataclasses import dataclass
 
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_ollama import ChatOllama
-
-
-@dataclass
-class PerfRun:
-    label: str
-    elapsed: float
-    approx_input_tokens: int
-    answer_preview: str
 
 
 def approx_tokens(text: str) -> int:
@@ -59,7 +50,7 @@ def build_focused_messages(user_query: str):
     return [system, compact_memory, current]
 
 
-def run_once(llm: ChatOllama, label: str, messages) -> PerfRun:
+def run_once(llm: ChatOllama, label: str, messages):
     serialized = "\n".join(m.content for m in messages)
     token_estimate = approx_tokens(serialized)
 
@@ -70,34 +61,34 @@ def run_once(llm: ChatOllama, label: str, messages) -> PerfRun:
     text = response.content if isinstance(response.content, str) else str(response.content)
     preview = text.strip().replace("\n", " ")[:160]
 
-    return PerfRun(
-        label=label,
-        elapsed=elapsed,
-        approx_input_tokens=token_estimate,
-        answer_preview=preview,
-    )
+    return {
+        "label": label,
+        "elapsed": elapsed,
+        "approx_input_tokens": token_estimate,
+        "answer_preview": preview,
+    }
 
 
-def print_report(before: PerfRun, after: PerfRun):
+def print_report(before, after):
     print("=" * 90)
     print("Prompt/Role/Memory Performance Demo")
     print("=" * 90)
     print(f"{'Scenario':<18} {'Elapsed(s)':<12} {'ApproxInputTokens':<18}")
     print("-" * 90)
-    print(f"{before.label:<18} {before.elapsed:<12.2f} {before.approx_input_tokens:<18}")
-    print(f"{after.label:<18} {after.elapsed:<12.2f} {after.approx_input_tokens:<18}")
+    print(f"{before['label']:<18} {before['elapsed']:<12.2f} {before['approx_input_tokens']:<18}")
+    print(f"{after['label']:<18} {after['elapsed']:<12.2f} {after['approx_input_tokens']:<18}")
 
-    speedup = before.elapsed / max(after.elapsed, 0.001)
-    token_reduction = 100.0 * (before.approx_input_tokens - after.approx_input_tokens) / max(before.approx_input_tokens, 1)
+    speedup = before["elapsed"] / max(after["elapsed"], 0.001)
+    token_reduction = 100.0 * (before["approx_input_tokens"] - after["approx_input_tokens"]) / max(before["approx_input_tokens"], 1)
 
     print("-" * 90)
     print(f"Speedup (focused / unfocused): {speedup:.2f}x")
     print(f"Approx input-token reduction:   {token_reduction:.1f}%")
 
     print("\nAnswer preview (unfocused):")
-    print(before.answer_preview)
+    print(before["answer_preview"])
     print("\nAnswer preview (focused):")
-    print(after.answer_preview)
+    print(after["answer_preview"])
 
 
 if __name__ == "__main__":

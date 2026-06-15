@@ -1,16 +1,9 @@
 import json
-from dataclasses import dataclass
 
 from utils.ollama_client import chat
 
 
-@dataclass
-class RegressionCase:
-    name: str
-    query: str
-
-
-def llm_answer(system_prompt: str, user_prompt: str) -> str:
+def llm_answer(system_prompt, user_prompt):
     try:
         return chat([
             {"role": "system", "content": system_prompt},
@@ -20,7 +13,7 @@ def llm_answer(system_prompt: str, user_prompt: str) -> str:
         return f"ERROR: {exc}"
 
 
-def is_json_with_keys(text: str, keys: list[str]) -> int:
+def is_json_with_keys(text, keys):
     try:
         parsed = json.loads(text)
         return int(all(k in parsed for k in keys))
@@ -29,9 +22,10 @@ def is_json_with_keys(text: str, keys: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    # (name, query) pairs - inline, no holder class needed.
     cases = [
-        RegressionCase("tool-single", "User asks weather in Berlin. Return tool call intent."),
-        RegressionCase("sql-agent", "User asks: List Engineering employees with salaries from SQLite sample."),
+        ("tool-single", "User asks weather in Berlin. Return tool call intent."),
+        ("sql-agent", "User asks: List Engineering employees with salaries from SQLite sample."),
     ]
 
     baseline_system = "Answer naturally."
@@ -42,25 +36,18 @@ if __name__ == "__main__":
 
     baseline_scores = []
     improved_scores = []
-
-    for c in cases:
-        baseline = llm_answer(baseline_system, c.query)
-        improved = llm_answer(improved_system, c.query)
+    for name, query in cases:
+        baseline = llm_answer(baseline_system, query)
+        improved = llm_answer(improved_system, query)
         b_score = is_json_with_keys(baseline, ["task_type", "payload"])
         i_score = is_json_with_keys(improved, ["task_type", "payload"])
         baseline_scores.append(b_score)
         improved_scores.append(i_score)
-        print({"case": c.name, "baseline_json_ok": b_score, "improved_json_ok": i_score})
+        print({"case": name, "baseline_json_ok": b_score, "improved_json_ok": i_score})
 
     baseline_rate = sum(baseline_scores) / max(len(baseline_scores), 1)
     improved_rate = sum(improved_scores) / max(len(improved_scores), 1)
     print({
-        "baseline": {
-            "score": round(baseline_rate, 4),
-            "details": {"pass_rate": round(baseline_rate, 4), "cases": len(baseline_scores)},
-        },
-        "improved": {
-            "score": round(improved_rate, 4),
-            "details": {"pass_rate": round(improved_rate, 4), "cases": len(improved_scores)},
-        },
+        "baseline": {"score": round(baseline_rate, 4), "details": {"pass_rate": round(baseline_rate, 4), "cases": len(baseline_scores)}},
+        "improved": {"score": round(improved_rate, 4), "details": {"pass_rate": round(improved_rate, 4), "cases": len(improved_scores)}},
     })

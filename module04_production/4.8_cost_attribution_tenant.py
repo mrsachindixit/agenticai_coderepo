@@ -1,10 +1,6 @@
-import contextvars
-from contextlib import contextmanager
 import os
 import sys
 import time
-import uuid
-from collections import defaultdict
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils.ollama_client import chat
@@ -17,70 +13,72 @@ PRICES = {
     "anthropic/claude-sonnet-4-5": {"in": 3.00, "out": 15.00},
 }
 
-
-_ctx: contextvars.ContextVar[dict] = contextvars.ContextVar("llm_ctx", default={})
-
-
-@contextmanager
-def attribute(**tags):
-    token = _ctx.set({**_ctx.get(), **tags, "request_id": str(uuid.uuid4())})
-    try:
-        yield
-    finally:
-        _ctx.reset(token)
+# Every tracked call appends one row here; chargeback() later sums these rows by tag.
+LEDGER = []
 
 
-LEDGER: list[dict] = []
-
-
-def estimate_tokens(text: str) -> int:
+def estimate_tokens(text):
     return max(1, len(text) // 4)
 
 
-def tracked_chat(messages, model_key: str = "ollama/llama3.1:latest", **opts) -> str:
-    t0 = time.perf_counter()
-    answer = chat(messages, model=model_key.split("/", 1)[1], **opts)
-    elapsed = time.perf_counter() - t0
+# Pass who the call is for (tags) explicitly, so its cost can be attributed to them.
+def tracked_chat(messages, tags, model_key="ollama/llama3.1:latest"):
+    started = time.perf_counter()
+    answer = chat(messages, model=model_key.split("/", 1)[1])
+    elapsed_ms = (time.perf_counter() - started) * 1000
 
-    in_tokens  = sum(estimate_tokens(m["content"]) for m in messages)
+    in_tokens = sum(estimate_tokens(m["content"]) for m in messages)
     out_tokens = estimate_tokens(answer)
-    p = PRICES[model_key]
-    cost = (in_tokens * p["in"] + out_tokens * p["out"]) / 1_000_000
+    price = PRICES[model_key]
+    cost = (in_tokens * price["in"] + out_tokens * price["out"]) / 1_000_000
 
-    LEDGER.append({
-        **_ctx.get(),
+    row = {
         "model": model_key,
         "in_tok": in_tokens,
         "out_tok": out_tokens,
         "cost_usd": cost,
-        "ms": round(elapsed * 1000, 1),
-    })
+        "ms": round(elapsed_ms, 1),
+    }
+    row.update(tags)            # add tenant/feature/etc. onto this row
+    LEDGER.append(row)
     return answer
 
 
-def chargeback(group_by: list[str]) -> list[dict]:
-    buckets: dict[tuple, dict] = defaultdict(lambda: {"calls": 0, "in_tok": 0, "out_tok": 0, "cost_usd": 0.0})
+def chargeback(group_by):
+    # Sum calls/tokens/cost for every distinct combination of the group_by tags.
+    buckets = {}
     for row in LEDGER:
         key = tuple(row.get(g) for g in group_by)
-        b = buckets[key]
-        b["calls"]    += 1
-        b["in_tok"]   += row["in_tok"]
-        b["out_tok"]  += row["out_tok"]
-        b["cost_usd"] += row["cost_usd"]
-    return [
-        {**dict(zip(group_by, k)), **{m: round(v, 4) if isinstance(v, float) else v for m, v in v.items()}}
-        for k, v in sorted(buckets.items())
-    ]
+        if key not in buckets:
+            buckets[key] = {"calls": 0, "in_tok": 0, "out_tok": 0, "cost_usd": 0.0}
+        bucket = buckets[key]
+        bucket["calls"] += 1
+        bucket["in_tok"] += row["in_tok"]
+        bucket["out_tok"] += row["out_tok"]
+        bucket["cost_usd"] += row["cost_usd"]
+
+    # Turn each bucket back into a flat row: the group_by values + the summed metrics.
+    report = []
+    for key, totals in sorted(buckets.items()):
+        line = dict(zip(group_by, key))
+        line["calls"] = totals["calls"]
+        line["in_tok"] = totals["in_tok"]
+        line["out_tok"] = totals["out_tok"]
+        line["cost_usd"] = round(totals["cost_usd"], 4)
+        report.append(line)
+    return report
 
 
 if __name__ == "__main__":
     for tenant, feature, n in [("acme", "chat", 2), ("acme", "summarize", 1), ("globex", "chat", 3)]:
         for i in range(n):
-            with attribute(tenant=tenant, feature=feature):
-                tracked_chat([
+            tracked_chat(
+                [
                     {"role": "system", "content": "Be concise."},
-                    {"role": "user",   "content": f"{feature} request {i} for {tenant}"},
-                ])
+                    {"role": "user", "content": f"{feature} request {i} for {tenant}"},
+                ],
+                tags={"tenant": tenant, "feature": feature},
+            )
 
     print("=== Per-tenant chargeback ===")
     for row in chargeback(["tenant"]):

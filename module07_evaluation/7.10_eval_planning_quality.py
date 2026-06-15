@@ -24,19 +24,38 @@ def parse_plan(text: str) -> list[dict]:
 
 def score_plan(steps: list[dict], required: list[str]) -> dict:
     names = [str(s.get("name", "")).lower() for s in steps]
+
+    # 1. Coverage: how many of the required steps show up at all.
+    covered = 0
+    for step in required:
+        if any(step in name for name in names):
+            covered += 1
+    coverage = covered / max(len(required), 1)
+
+    # 2. Dependencies declared: every step has a depends_on list (even if empty).
     deps_ok = all(isinstance(s.get("depends_on", []), list) for s in steps)
-    coverage = sum(1 for term in required if any(term in n for n in names))
-    order_terms = ["load", "split", "embed", "retrieve", "answer"]
-    found_positions = []
-    for term in order_terms:
-        idx = next((i for i, name in enumerate(names) if term in name), -1)
-        found_positions.append(idx)
-    order_ok = all(pos >= 0 for pos in found_positions) and found_positions == sorted(found_positions)
+
+    # 3. Correct order: the stages must appear load -> split -> embed -> retrieve -> answer.
+    pipeline = ["load", "split", "embed", "retrieve", "answer"]
+    positions = []
+    for stage in pipeline:
+        found_at = -1                       # -1 means this stage is missing from the plan
+        for i, name in enumerate(names):
+            if stage in name:
+                found_at = i
+                break
+        positions.append(found_at)
+
+    all_present = -1 not in positions
+    in_order = positions == sorted(positions)   # already-sorted indices => correct order
+    order_ok = all_present and in_order
+
+    score = round(0.5 * coverage + 0.25 * int(deps_ok) + 0.25 * int(order_ok), 3)
     return {
-        "coverage": coverage / max(len(required), 1),
+        "coverage": round(coverage, 3),
         "deps_ok": int(deps_ok),
         "order_ok": int(order_ok),
-        "score": round((0.5 * (coverage / max(len(required), 1))) + (0.25 * int(deps_ok)) + (0.25 * int(order_ok)), 3),
+        "score": score,
     }
 
 

@@ -1,14 +1,6 @@
 import time
-from dataclasses import dataclass
 
 from utils.ollama_client import chat
-
-
-@dataclass
-class GateInput:
-    quality_pass_rate: float
-    safety_block_rate: float
-    p95_latency_ms: float
 
 
 THRESHOLDS = {
@@ -18,7 +10,7 @@ THRESHOLDS = {
 }
 
 
-def llm_answer(system_prompt: str, user_prompt: str) -> tuple[str, float]:
+def llm_answer(system_prompt, user_prompt):
     started = time.perf_counter()
     try:
         text = chat([
@@ -30,17 +22,17 @@ def llm_answer(system_prompt: str, user_prompt: str) -> tuple[str, float]:
     return text, (time.perf_counter() - started) * 1000
 
 
-def evaluate_gate(inp: GateInput) -> dict:
+def evaluate_gate(quality_pass_rate, safety_block_rate, p95_latency_ms):
     checks = {
-        "quality_ok": inp.quality_pass_rate >= THRESHOLDS["quality_pass_rate"],
-        "safety_ok": inp.safety_block_rate >= THRESHOLDS["safety_block_rate"],
-        "latency_ok": inp.p95_latency_ms <= THRESHOLDS["p95_latency_ms"],
+        "quality_ok": quality_pass_rate >= THRESHOLDS["quality_pass_rate"],
+        "safety_ok": safety_block_rate >= THRESHOLDS["safety_block_rate"],
+        "latency_ok": p95_latency_ms <= THRESHOLDS["p95_latency_ms"],
     }
     checks["release_ok"] = all(checks.values())
     return checks
 
 
-def run_gate(system_prompt: str, quality_cases: list[tuple[str, list[str]]], safety_cases: list[str]) -> dict:
+def run_gate(system_prompt, quality_cases, safety_cases):
     latencies = []
     quality_hits = []
     for question, required_terms in quality_cases:
@@ -57,19 +49,18 @@ def run_gate(system_prompt: str, quality_cases: list[tuple[str, list[str]]], saf
 
     latencies_sorted = sorted(latencies)
     p95_index = max(int(0.95 * len(latencies_sorted)) - 1, 0)
-    metrics = GateInput(
-        quality_pass_rate=sum(quality_hits) / max(len(quality_hits), 1),
-        safety_block_rate=sum(safety_hits) / max(len(safety_hits), 1),
-        p95_latency_ms=latencies_sorted[p95_index],
-    )
-    gate = evaluate_gate(metrics)
+    quality_pass_rate = sum(quality_hits) / max(len(quality_hits), 1)
+    safety_block_rate = sum(safety_hits) / max(len(safety_hits), 1)
+    p95_latency_ms = latencies_sorted[p95_index]
+
+    gate = evaluate_gate(quality_pass_rate, safety_block_rate, p95_latency_ms)
     return {
         "score": int(gate.get("release_ok", False)),
         "details": {
             "metrics": {
-                "quality_pass_rate": round(metrics.quality_pass_rate, 4),
-                "safety_block_rate": round(metrics.safety_block_rate, 4),
-                "p95_latency_ms": round(metrics.p95_latency_ms, 1),
+                "quality_pass_rate": round(quality_pass_rate, 4),
+                "safety_block_rate": round(safety_block_rate, 4),
+                "p95_latency_ms": round(p95_latency_ms, 1),
             },
             "gate": gate,
         },

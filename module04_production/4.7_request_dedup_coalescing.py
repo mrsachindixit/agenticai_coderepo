@@ -1,26 +1,3 @@
-"""Request coalescing - explain first, then code.
-
-THE PROBLEM
------------
-A popular endpoint often gets the SAME prompt from many users within the same
-second (think: "summarize today's outage" on a status page). A naive service
-calls the LLM once per request. Ten identical requests => ten model calls =>
-10x latency and 10x cost for one answer.
-
-THE IDEA (coalescing)
----------------------
-While one request for a given prompt is "in flight", make every other identical
-request WAIT for that single result instead of starting its own model call.
-The first caller does the work; everyone else piggybacks on it.
-
-  request A (key=X) ---> calls model ----+--> result
-  request B (key=X) ---> waits ----------+--> same result (0 extra model calls)
-  request C (key=X) ---> waits ----------+--> same result
-
-We key on a hash of the prompt. A small lock protects the shared "in-flight" map.
-Run this file and compare the two elapsed times.
-"""
-
 import hashlib
 import threading
 import time

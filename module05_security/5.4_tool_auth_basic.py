@@ -1,27 +1,21 @@
-from dataclasses import dataclass
 from typing import Callable
 
 
-@dataclass
-class AuthContext:
-    user_id: str
-    scopes: set[str]
-
-
-TOKENS: dict[str, AuthContext] = {
-    "token_viewer": AuthContext(user_id="u1", scopes={"weather.read"}),
-    "token_finance": AuthContext(user_id="u2", scopes={"weather.read", "invoice.read"}),
+# token -> {user_id, scopes}. Add a token or scope here and watch access change.
+TOKENS = {
+    "token_viewer": {"user_id": "u1", "scopes": {"weather.read"}},
+    "token_finance": {"user_id": "u2", "scopes": {"weather.read", "invoice.read"}},
 }
 
 
-def resolve_auth(token: str) -> AuthContext:
+def resolve_auth(token: str) -> dict:
     if token not in TOKENS:
         raise PermissionError("ACCESS_DENIED: invalid token")
     return TOKENS[token]
 
 
-def authorize(auth: AuthContext, required_scope: str) -> None:
-    if required_scope not in auth.scopes:
+def authorize(auth: dict, required_scope: str) -> None:
+    if required_scope not in auth["scopes"]:
         raise PermissionError(f"ACCESS_DENIED: missing scope '{required_scope}'")
 
 
